@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>평생건강가이드북</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    margin: 0; background: #f4f6f8; color: #222; line-height: 1.5;
+  }
+  header {
+    background: #2f6f5e; color: #fff; padding: 18px 20px;
+  }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 5px 0 0; font-size: 14px; opacity: .85; }
+
+  main { max-width: 720px; margin: 0 auto; padding: 16px; }
+
+  /* ===== 책 구조 ===== */
+  /* 파트 화면 위쪽 막대: 차례 버튼 + "Part N / 10" */
+  .partbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 4px 14px;
+  }
+  .partbar .toc-btn {
+    display: flex; align-items: center; gap: 6px;
+    border: 1px solid #cdd3d7; background: #fff; color: #444;
+    padding: 10px 14px; border-radius: 8px; font-size: 15px; cursor: pointer;
+  }
+  .partbar .counter { font-size: 15px; font-weight: 700; color: #2f6f5e; }
+
+  /* 아래 큰 넘김 버튼 */
+  .pager { display: flex; gap: 12px; margin: 20px 0 8px; }
+  .pager button {
+    flex: 1; height: 56px; border: 0; border-radius: 12px;
+    font-size: 17px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .pager .prev { background: #e7ebee; color: #444; }
+  .pager .next { background: #2f6f5e; color: #fff; }
+
+  /* 차례(목차) */
+  .toc-hero {
+    display: flex; align-items: center; gap: 14px;
+    background: #e1f5ee; border: 1px solid #bfe6d8; border-radius: 14px;
+    padding: 18px 18px; margin-bottom: 18px; cursor: pointer; width: 100%; text-align: left;
+  }
+  .toc-hero .ic { font-size: 30px; }
+  .toc-hero .t { font-size: 18px; font-weight: 700; color: #08423a; }
+  .toc-hero .s { font-size: 14px; color: #0f6e56; }
+
+  .toc-item {
+    display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+    background: #fff; border: 1px solid #e3e7ea; border-radius: 12px;
+    padding: 16px 16px; margin-bottom: 10px; cursor: pointer;
+  }
+  .toc-item .no { width: 30px; font-size: 16px; font-weight: 700; color: #9aa4a9; }
+  .toc-item .ic { font-size: 22px; }
+  .toc-item .t { flex: 1; font-size: 17px; color: #222; }
+  .toc-item .ready { font-size: 12px; color: #b6bcc0; }
+
+  .toc-input-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+    background: #fff; border: 2px dashed #9fbcb2; color: #2f6f5e;
+    border-radius: 12px; padding: 16px; margin: 4px 0 18px; font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+
+  /* 준비 중 파트 */
+  .prep { text-align: center; color: #9aa4a9; padding: 60px 20px; }
+  .prep .big { font-size: 40px; margin-bottom: 10px; }
+  .prep .t { font-size: 18px; color: #666; font-weight: 700; }
+  .prep .s { font-size: 14px; margin-top: 6px; }
+  .part-title { font-size: 22px; font-weight: 700; margin: 0 0 16px; color: #222; }
+
+  .card { background: #fff; border: 1px solid #e3e7ea; border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
+  .card h2 { margin: 0; padding: 12px 16px; font-size: 16px; background: #f0f3f4; border-bottom: 1px solid #e3e7ea; }
+  .card .body { padding: 8px 16px; }
+
+  .row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f2f3; gap: 10px; }
+  .row:last-child { border-bottom: 0; }
+  .row label { flex: 1; font-size: 16px; }
+  .row .unit { font-size: 13px; color: #999; width: 56px; }
+  .row input, .row select {
+    width: 120px; padding: 11px; border: 1px solid #cdd3d7; border-radius: 8px; font-size: 17px; text-align: right;
+  }
+  .row select { text-align: left; }
+
+  .actions { display: flex; gap: 10px; margin: 8px 0 24px; }
+  .actions button {
+    flex: 1; padding: 14px; border: 0; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  .btn-primary { background: #2f6f5e; color: #fff; }
+  .btn-ghost { background: #e7ebee; color: #444; }
+
+  /* 한눈에 보기 */
+  .summary-top { display: flex; gap: 10px; margin-bottom: 16px; }
+  .summary-top .box { flex: 1; text-align: center; padding: 14px 6px; border-radius: 10px; color: #fff; }
+  .summary-top .num { font-size: 26px; font-weight: 800; }
+  .summary-top .lbl { font-size: 12px; }
+  .bg-good { background: #3a9d6a; }
+  .bg-warn { background: #e0a12e; }
+  .bg-bad  { background: #d1584f; }
+
+  .metric { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f2f3; gap: 10px; }
+  .metric:last-child { border-bottom: 0; }
+  .metric .name { flex: 1; font-size: 14px; }
+  .metric .val { font-weight: 700; font-size: 15px; width: 90px; text-align: right; }
+  .metric .ref { font-size: 11px; color: #999; width: 130px; text-align: right; }
+  .badge { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 20px; width: 52px; text-align: center; }
+  .badge.good { background: #e2f3ea; color: #2c8156; }
+  .badge.warn { background: #fbf0d8; color: #a9761a; }
+  .badge.bad  { background: #f8e0de; color: #b23a31; }
+  .badge.none { background: #eef1f2; color: #aaa; }
+
+  .empty { text-align: center; color: #999; padding: 40px 0; }
+  .updated { text-align: center; font-size: 12px; color: #aaa; margin-top: 8px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>평생건강가이드북</h1>
+  <p>검진 수치를 입력하면 내 건강 상태를 한눈에 보여줍니다.</p>
+</header>
+
+<main>
+  <!-- 차례(목차) 화면 -->
+  <section id="screen-toc">
+    <div id="tocList"></div>
+  </section>
+
+  <!-- 파트 화면 (한 파트씩 넘기기) -->
+  <section id="screen-part" class="hidden">
+    <div class="partbar">
+      <button class="toc-btn" onclick="goToc()">☰ 차례</button>
+      <span class="counter" id="partCounter">Part 1 / 10</span>
+    </div>
+    <div id="partContent"></div>
+    <div class="pager">
+      <button class="prev" onclick="prevPart()">◀ 이전</button>
+      <button class="next" onclick="nextPart()">다음 ▶</button>
+    </div>
+  </section>
+
+  <!-- 검진 수치 입력 화면 -->
+  <section id="screen-input" class="hidden">
+    <div class="partbar">
+      <button class="toc-btn" onclick="goToc()">☰ 차례</button>
+      <span class="counter">검진 수치 입력</span>
+    </div>
+    <div id="form"></div>
+    <div class="actions">
+      <button class="btn-ghost" onclick="resetForm()">비우기</button>
+      <button class="btn-primary" onclick="save()">저장하고 결과 보기</button>
+    </div>
+  </section>
+</main>
+
+<script>
+// ===== 1. 검진 항목 정의 (기준치 = 표준 검진 참고치) =====
+// eval(값, 성별) → 'good' | 'warn' | 'bad'  (값 없으면 판정 안 함)
+const SECTIONS = [
+  { title: "기본 정보", items: [
+    { key: "sex", name: "성별", unit: "", type: "select", options: ["남", "여"] },
+    { key: "height", name: "키", unit: "cm" },
+    { key: "weight", name: "몸무게", unit: "kg" },
+    { key: "waist", name: "허리둘레", unit: "cm",
+      ref: s => s === "여" ? "여 <85" : "남 <90",
+      eval: (v, s) => { const lim = s === "여" ? 85 : 90; return v < lim ? "good" : "bad"; } },
+  ]},
+  { title: "혈압", items: [
+    { key: "sbp", name: "수축기 혈압", unit: "mmHg", ref: () => "<120",
+      eval: v => v < 120 ? "good" : v < 140 ? "warn" : "bad" },
+    { key: "dbp", name: "이완기 혈압", unit: "mmHg", ref: () => "<80",
+      eval: v => v < 80 ? "good" : v < 90 ? "warn" : "bad" },
+  ]},
+  { title: "당뇨", items: [
+    { key: "glucose", name: "공복혈당", unit: "mg/dL", ref: () => "<100",
+      eval: v => v < 100 ? "good" : v < 126 ? "warn" : "bad" },
+  ]},
+  { title: "콜레스테롤 (혈관건강)", items: [
+    { key: "tchol", name: "총콜레스테롤", unit: "mg/dL", ref: () => "<200",
+      eval: v => v < 200 ? "good" : v < 240 ? "warn" : "bad" },
+    { key: "hdl", name: "HDL(좋은)", unit: "mg/dL", ref: () => "≥60 좋음",
+      eval: v => v >= 60 ? "good" : v >= 40 ? "warn" : "bad" },
+    { key: "ldl", name: "LDL(나쁜)", unit: "mg/dL", ref: () => "<130",
+      eval: v => v < 130 ? "good" : v < 160 ? "warn" : "bad" },
+    { key: "tg", name: "중성지방", unit: "mg/dL", ref: () => "<150",
+      eval: v => v < 150 ? "good" : v < 200 ? "warn" : "bad" },
+  ]},
+  { title: "간 기능", items: [
+    { key: "ast", name: "AST(SGOT)", unit: "U/L", ref: () => "≤40",
+      eval: v => v <= 40 ? "good" : v <= 50 ? "warn" : "bad" },
+    { key: "alt", name: "ALT(SGPT)", unit: "U/L", ref: () => "≤40",
+      eval: v => v <= 40 ? "good" : v <= 50 ? "warn" : "bad" },
+    { key: "ggt", name: "감마-GTP", unit: "U/L",
+      ref: s => s === "여" ? "여 8~35" : "남 11~63",
+      eval: (v, s) => { const hi = s === "여" ? 35 : 63; return v <= hi ? "good" : v <= hi * 1.5 ? "warn" : "bad"; } },
+  ]},
+  { title: "신장 기능", items: [
+    { key: "cr", name: "혈청 크레아티닌", unit: "mg/dL", ref: () => "0.7~1.4",
+      eval: v => (v >= 0.5 && v <= 1.4) ? "good" : (v < 0.5 || v <= 1.6) ? "warn" : "bad" },
+    { key: "egfr", name: "eGFR(사구체여과율)", unit: "", ref: () => "≥60",
+      eval: v => v >= 60 ? "good" : v >= 45 ? "warn" : "bad" },
+  ]},
+  { title: "빈혈", items: [
+    { key: "hb", name: "혈색소(Hb)", unit: "g/dL",
+      ref: s => s === "여" ? "여 12~16" : "남 13~16.5",
+      eval: (v, s) => { const lo = s === "여" ? 12 : 13; return v >= lo ? "good" : v >= lo - 1 ? "warn" : "bad"; } },
+  ]},
+];
+
+// BMI는 키·몸무게로 자동 계산하는 특별 항목
+function computeBMI(d) {
+  const h = parseFloat(d.height), w = parseFloat(d.weight);
+  if (!h || !w) return null;
+  const bmi = w / ((h / 100) ** 2);
+  return Math.round(bmi * 10) / 10;
+}
+function bmiStatus(bmi) {
+  if (bmi == null) return "none";
+  if (bmi < 18.5) return "warn";       // 저체중
+  if (bmi < 23) return "good";         // 정상
+  if (bmi < 25) return "warn";         // 과체중
+  return "bad";                        // 비만
+}
+
+const STORE_KEY = "health-guide-data";
+const STATUS_LABEL = { good: "정상", warn: "주의", bad: "위험", none: "-" };
+
+// ===== 2. 입력 폼 그리기 =====
+function buildForm() {
+  const data = load();
+  let html = "";
+  for (const sec of SECTIONS) {
+    html += `<div class="card"><h2>${sec.title}</h2><div class="body">`;
+    for (const it of sec.items) {
+      const v = data[it.key] ?? "";
+      if (it.type === "select") {
+        const opts = it.options.map(o =>
+          `<option value="${o}" ${v === o ? "selected" : ""}>${o}</option>`).join("");
+        html += `<div class="row"><label>${it.name}</label>
+          <span class="unit">${it.unit}</span>
+          <select data-key="${it.key}"><option value="">선택</option>${opts}</select></div>`;
+      } else {
+        html += `<div class="row"><label>${it.name}</label>
+          <span class="unit">${it.unit}</span>
+          <input type="number" inputmode="decimal" step="any" data-key="${it.key}" value="${v}" placeholder="-"></div>`;
+      }
+    }
+    html += `</div></div>`;
+  }
+  document.getElementById("form").innerHTML = html;
+}
+
+// ===== 3. 저장 / 불러오기 =====
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
+  catch { return {}; }
+}
+function save() {
+  const data = {};
+  document.querySelectorAll("[data-key]").forEach(el => {
+    if (el.value !== "") data[el.dataset.key] = el.value;
+  });
+  data._updated = new Date().toISOString();
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  goPart(2); // 저장하면 Part 2(내 건강 점수·한눈에 보기)로
+}
+function resetForm() {
+  if (!confirm("입력한 값을 모두 비울까요?")) return;
+  localStorage.removeItem(STORE_KEY);
+  buildForm();
+}
+
+// ===== 4. 한눈에 보기 그리기 (el = 그려 넣을 자리) =====
+function buildView(el) {
+  const data = load();
+  const hasData = Object.keys(data).some(k => k !== "_updated");
+  if (!hasData) {
+    el.innerHTML = `<div class="empty">아직 입력한 수치가 없어요.<br><br>
+      <button class="btn-primary" style="padding:12px 20px;border:0;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer" onclick="goInput()">검진 수치 입력하러 가기</button></div>`;
+    return;
+  }
+  const sex = data.sex;
+  let good = 0, warn = 0, bad = 0;
+
+  // 항목별 판정 결과를 섹션별로 모으기
+  const bmi = computeBMI(data);
+  const bySection = {};
+  for (const sec of SECTIONS) {
+    for (const it of sec.items) {
+      if (it.type === "select") continue;
+      const raw = data[it.key];
+      if (raw == null || raw === "") continue;
+      const num = parseFloat(raw);
+      let status = "none";
+      if (it.eval && !isNaN(num)) status = it.eval(num, sex);
+      const refText = it.ref ? it.ref(sex) : "";
+      (bySection[sec.title] ??= []).push({ name: it.name, valText: raw + " " + it.unit, refText, status });
+    }
+  }
+  // BMI를 기본 정보 섹션 앞에 끼워넣기
+  if (bmi != null) (bySection["기본 정보"] ??= []).unshift(
+    { name: "BMI(체질량지수)", valText: bmi, refText: "18.5~22.9", status: bmiStatus(bmi) });
+
+  // 카운트
+  for (const arr of Object.values(bySection))
+    for (const r of arr) {
+      if (r.status === "good") good++;
+      else if (r.status === "warn") warn++;
+      else if (r.status === "bad") bad++;
+    }
+
+  let html = `<div class="summary-top">
+    <div class="box bg-good"><div class="num">${good}</div><div class="lbl">정상</div></div>
+    <div class="box bg-warn"><div class="num">${warn}</div><div class="lbl">주의</div></div>
+    <div class="box bg-bad"><div class="num">${bad}</div><div class="lbl">위험</div></div>
+  </div>`;
+
+  for (const sec of SECTIONS) {
+    const arr = bySection[sec.title];
+    if (!arr || !arr.length) continue;
+    html += `<div class="card"><h2>${sec.title}</h2><div class="body">`;
+    for (const r of arr) {
+      html += `<div class="metric">
+        <span class="name">${r.name}</span>
+        <span class="val">${r.valText}</span>
+        <span class="ref">${r.refText}</span>
+        <span class="badge ${r.status}">${STATUS_LABEL[r.status]}</span>
+      </div>`;
+    }
+    html += `</div></div>`;
+  }
+
+  if (data._updated) {
+    const d = new Date(data._updated);
+    html += `<div class="updated">마지막 저장: ${d.toLocaleString("ko-KR")}</div>`;
+  }
+  el.innerHTML = html;
+}
+
+// ===== 5. 책 구조: 파트 목록 =====
+// status: 'live' = 지금 동작, 'prep' = 준비 중(내용은 다음에)
+const PARTS = [
+  { n: 1,  icon: "✉️", title: "의사 선생님의 편지",       status: "prep" },
+  { n: 2,  icon: "⭐", title: "내 건강 점수",             status: "live" },
+  { n: 3,  icon: "🛡️", title: "내 몸의 믿는 구석",        status: "prep" },
+  { n: 4,  icon: "⚠️", title: "내 몸에 보내는 경고",       status: "prep" },
+  { n: 5,  icon: "📖", title: "그게 무슨 뜻이에요?",       status: "prep" },
+  { n: 6,  icon: "🎯", title: "다음 검진까지 프로젝트",     status: "prep" },
+  { n: 7,  icon: "💊", title: "내 영양제, 잘 먹고 있나요?", status: "prep" },
+  { n: 8,  icon: "🌱", title: "오늘부터 하는 건강습관",     status: "prep" },
+  { n: 9,  icon: "🔮", title: "앞으로 생길 가능성 높은 질환", status: "prep" },
+  { n: 10, icon: "🤝", title: "의사의 마지막 이야기",       status: "prep" },
+];
+function partByNum(n) { return PARTS.find(p => p.n === n); }
+
+let currentPart = 1;
+
+// 화면 하나만 보이기
+function showScreen(id) {
+  ["screen-toc", "screen-part", "screen-input"].forEach(s =>
+    document.getElementById(s).classList.toggle("hidden", s !== id));
+  window.scrollTo(0, 0);
+}
+
+// 차례(목차)
+function goToc() {
+  const hub = partByNum(8); // 오늘의 체크리스트
+  let html = `<button class="toc-hero" onclick="goPart(8)">
+      <span class="ic">${hub.icon}</span>
+      <span><span class="t">오늘의 체크리스트</span><br><span class="s">매일 여기부터 시작</span></span>
+    </button>`;
+  html += `<button class="toc-input-btn" onclick="goInput()">✎ 검진 수치 입력·수정</button>`;
+  for (const p of PARTS) {
+    const tag = p.status === "live" ? "" : `<span class="ready">준비 중</span>`;
+    html += `<button class="toc-item" onclick="goPart(${p.n})">
+        <span class="no">${p.n}</span><span class="ic">${p.icon}</span>
+        <span class="t">${p.title}</span>${tag}
+      </button>`;
+  }
+  document.getElementById("tocList").innerHTML = html;
+  showScreen("screen-toc");
+}
+
+// 검진 수치 입력 화면
+function goInput() {
+  buildForm();
+  showScreen("screen-input");
+}
+
+// 파트 화면
+function goPart(n) {
+  currentPart = n;
+  const p = partByNum(n);
+  document.getElementById("partCounter").textContent = `Part ${n} / 10`;
+  const el = document.getElementById("partContent");
+  el.innerHTML = `<div class="part-title">${p.icon} ${p.title}</div>`;
+  const inner = document.createElement("div");
+  el.appendChild(inner);
+
+  if (n === 2) {
+    buildView(inner); // 내 건강 점수 자리에 '한눈에 보기'
+  } else {
+    inner.innerHTML = `<div class="prep">
+      <div class="big">${p.icon}</div>
+      <div class="t">준비 중이에요</div>
+      <div class="s">이 파트의 내용은 곧 채워질 거예요.</div>
+    </div>`;
+  }
+  showScreen("screen-part");
+}
+
+function prevPart() { currentPart > 1 ? goPart(currentPart - 1) : goToc(); }
+function nextPart() { currentPart < PARTS.length ? goPart(currentPart + 1) : goToc(); }
+
+// 시작 — 차례부터
+goToc();
+</script>
+</body>
+</html>
