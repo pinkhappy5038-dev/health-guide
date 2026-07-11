@@ -172,3 +172,53 @@ export function buildSummary(data: Record<string, string>): Summary {
   }
   return { hasData, good, warn, bad, missing, bySection, updated: data._updated };
 }
+
+// ===== Part 2: 영역별 건강 점수 + 별점 =====
+// 규칙: 정상=100 · 주의=60 · 위험=30, 영역 안 항목 평균. 값 없는 항목은 평균에서 제외.
+// 한 영역에 넣은 값이 하나도 없으면 score=null(아직 점수 없음).
+const STATUS_SCORE: Record<"good" | "warn" | "bad", number> = { good: 100, warn: 60, bad: 30 };
+
+const ITEM_BY_KEY: Record<string, Item> = {};
+for (const sec of SECTIONS) for (const it of sec.items) ITEM_BY_KEY[it.key] = it;
+
+export type AreaScore = {
+  key: string; name: string; icon: string;
+  score: number | null; stars: number; filled: number; total: number;
+};
+
+const SCORE_AREAS: { key: string; name: string; icon: string; itemKeys: string[] }[] = [
+  { key: "vascular", name: "혈관 건강", icon: "🫀", itemKeys: ["sbp", "dbp", "tchol", "hdl", "ldl", "tg"] },
+  { key: "glucose",  name: "혈당",      icon: "🍬", itemKeys: ["glucose"] },
+  { key: "liver",    name: "간 건강",   icon: "🫁", itemKeys: ["ast", "alt", "ggt"] },
+  { key: "kidney",   name: "콩팥 건강", icon: "🫘", itemKeys: ["cr", "egfr"] },
+  { key: "weight",   name: "체중·비만", icon: "⚖️", itemKeys: ["bmi", "waist"] },
+];
+
+// 항목 하나의 판정(정상/주의/위험). 값이 없거나 판정 불가면 null.
+function statusOfKey(key: string, data: Record<string, string>, sex: string): Status | null {
+  if (key === "bmi") { const bmi = computeBMI(data); return bmi == null ? null : bmiStatus(bmi); }
+  const it = ITEM_BY_KEY[key];
+  if (!it || !it.eval) return null;
+  const raw = data[key];
+  if (raw == null || raw === "") return null;
+  const num = parseFloat(raw);
+  if (isNaN(num)) return null;
+  return it.eval(num, sex);
+}
+
+export function buildScores(data: Record<string, string>): AreaScore[] {
+  const sex = data.sex ?? "";
+  return SCORE_AREAS.map((area) => {
+    const scores: number[] = [];
+    for (const k of area.itemKeys) {
+      const st = statusOfKey(k, data, sex);
+      if (st === "good" || st === "warn" || st === "bad") scores.push(STATUS_SCORE[st]);
+    }
+    const total = area.itemKeys.length;
+    const filled = scores.length;
+    if (filled === 0) return { key: area.key, name: area.name, icon: area.icon, score: null, stars: 0, filled, total };
+    const score = Math.round(scores.reduce((a, b) => a + b, 0) / filled);
+    const stars = score >= 90 ? 5 : score >= 70 ? 4 : score >= 50 ? 3 : score >= 30 ? 2 : 1;
+    return { key: area.key, name: area.name, icon: area.icon, score, stars, filled, total };
+  });
+}

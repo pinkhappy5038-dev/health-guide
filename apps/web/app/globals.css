@@ -108,6 +108,17 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .badge.bad  { background: #f8e0de; color: #b23a31; }
 .badge.none { background: #eef1f2; color: #aaa; }
 
+/* Part 2: 영역별 점수 + 별점 */
+.score-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f2f3; gap: 10px; }
+.score-row:last-child { border-bottom: 0; }
+.score-row .ic { font-size: 22px; width: 30px; text-align: center; }
+.score-row .name { flex: 1; font-size: 15px; }
+.score-row .score { font-size: 17px; font-weight: 800; width: 58px; text-align: right; color: #2f6f5e; }
+.score-row .stars { font-size: 18px; letter-spacing: 1px; width: 96px; text-align: right; }
+.score-row .stars .on { color: #f0b429; }
+.score-row .stars .off { color: #dbe0e3; }
+.score-row .none { font-size: 13px; color: #aaa; width: 154px; text-align: right; }
+
 /* 안내 문구 */
 .input-hint {
   background: #e1f5ee; border: 1px solid #bfe6d8; color: #0f6e56;

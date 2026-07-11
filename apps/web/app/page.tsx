@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary,
+  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores,
 } from "./lib/health";
 import type { Item } from "./lib/health";
 
@@ -132,6 +132,7 @@ function PartView({
 // ===== Part 2: 내 건강 점수(한눈에 보기) =====
 function SummaryView({ data, onInput }: { data: Data; onInput: () => void }) {
   const s = buildSummary(data);
+  const scores = buildScores(data);
   if (!s.hasData) {
     return (
       <div className="empty">
@@ -142,6 +143,29 @@ function SummaryView({ data, onInput }: { data: Data; onInput: () => void }) {
   }
   return (
     <>
+      <div className="card">
+        <h2>내 건강 점수</h2>
+        <div className="body">
+          {scores.map((a) => (
+            <div className="score-row" key={a.key}>
+              <span className="ic">{a.icon}</span>
+              <span className="name">{a.name}</span>
+              {a.score == null ? (
+                <span className="none">아직 점수 없음</span>
+              ) : (
+                <>
+                  <span className="score">{a.score}점</span>
+                  <span className="stars">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <span key={i} className={i <= a.stars ? "on" : "off"}>★</span>
+                    ))}
+                  </span>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
       <div className="summary-top">
         <div className="box bg-good"><div className="num">{s.good}</div><div className="lbl">정상</div></div>
         <div className="box bg-warn"><div className="num">{s.warn}</div><div className="lbl">주의</div></div>
