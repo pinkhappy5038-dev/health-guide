@@ -7,8 +7,9 @@ export type Item = {
   key: string;
   name: string;
   unit: string;
-  type?: "select";
+  type?: "select" | "text";
   options?: string[];
+  placeholder?: string;
   ref?: (sex: string) => string;
   eval?: (v: number, sex: string) => Status;
 };
@@ -65,6 +66,14 @@ export const SECTIONS: Section[] = [
       ref: (s) => s === "여" ? "여 12~16" : "남 13~16.5",
       eval: (v, s) => { const lo = s === "여" ? 12 : 13; return v >= lo ? "good" : v >= lo - 1 ? "warn" : "bad"; } },
   ]},
+];
+
+// ===== 나에 대해 (건강 수치 아님 — 입력만 받고 Part 2 점수엔 안 나옴) =====
+// Part 6(다음 검진까지 프로젝트)·Part 9(미래 질환 위험)에서 쓸 재료.
+export const PROFILE_FIELDS: Item[] = [
+  { key: "birthYear", name: "출생연도", unit: "년", placeholder: "예: 1958" },
+  { key: "job", name: "직업", unit: "", type: "text", placeholder: "예: 주부, 회사원" },
+  { key: "nextCheckup", name: "다음 검진 예정", unit: "", type: "text", placeholder: "예: 2028년 1월" },
 ];
 
 // BMI는 키·몸무게로 자동 계산하는 특별 항목

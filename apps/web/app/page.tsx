@@ -5,8 +5,9 @@
 
 import { useEffect, useState } from "react";
 import {
-  SECTIONS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary,
+  SECTIONS, PROFILE_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary,
 } from "./lib/health";
+import type { Item } from "./lib/health";
 
 type Data = Record<string, string>;
 type Screen = "toc" | "part" | "input";
@@ -195,27 +196,20 @@ function InputForm({
         검진 결과지에 있는 수치만 넣으세요. 없는 항목은 비워두면 알아서 건너뜁니다.
       </div>
       <div>
+        <div className="card">
+          <h2>나에 대해</h2>
+          <div className="body">
+            {PROFILE_FIELDS.map((it) => (
+              <FieldRow key={it.key} it={it} value={draft[it.key] ?? ""} onField={onField} />
+            ))}
+          </div>
+        </div>
         {SECTIONS.map((sec) => (
           <div className="card" key={sec.title}>
             <h2>{sec.title}</h2>
             <div className="body">
               {sec.items.map((it) => (
-                <div className="row" key={it.key}>
-                  <label>{it.name}</label>
-                  <span className="unit">{it.unit}</span>
-                  {it.type === "select" ? (
-                    <select value={draft[it.key] ?? ""} onChange={(e) => onField(it.key, e.target.value)}>
-                      <option value="">선택</option>
-                      {it.options!.map((o) => <option key={o} value={o}>{o}</option>)}
-                    </select>
-                  ) : (
-                    <input
-                      type="number" inputMode="decimal" step="any" placeholder="-"
-                      value={draft[it.key] ?? ""}
-                      onChange={(e) => onField(it.key, e.target.value)}
-                    />
-                  )}
-                </div>
+                <FieldRow key={it.key} it={it} value={draft[it.key] ?? ""} onField={onField} />
               ))}
             </div>
           </div>
@@ -226,5 +220,27 @@ function InputForm({
         <button className="btn-primary" onClick={onSave}>저장하고 결과 보기</button>
       </div>
     </section>
+  );
+}
+
+// 입력칸 한 줄 (선택 / 글자 / 숫자)
+function FieldRow({ it, value, onField }: { it: Item; value: string; onField: (k: string, v: string) => void }) {
+  return (
+    <div className="row">
+      <label>{it.name}</label>
+      <span className="unit">{it.unit}</span>
+      {it.type === "select" ? (
+        <select value={value} onChange={(e) => onField(it.key, e.target.value)}>
+          <option value="">선택</option>
+          {it.options!.map((o) => <option key={o} value={o}>{o}</option>)}
+        </select>
+      ) : it.type === "text" ? (
+        <input type="text" placeholder={it.placeholder ?? ""} value={value}
+          onChange={(e) => onField(it.key, e.target.value)} />
+      ) : (
+        <input type="number" inputMode="decimal" step="any" placeholder={it.placeholder ?? "-"}
+          value={value} onChange={(e) => onField(it.key, e.target.value)} />
+      )}
+    </div>
   );
 }
