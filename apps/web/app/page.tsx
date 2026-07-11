@@ -196,6 +196,10 @@ function SummaryView({ data, onInput }: { data: Data; onInput: () => void }) {
           <button className="btn-primary missing-btn" onClick={onInput}>수치 채우러 가기</button>
         </div>
       )}
+      <div className="disclaimer">
+        판정 기준은 국가건강검진·관련 학회 기준을 따릅니다. 점수와 별점은 이해를 돕기 위한 요약이며,
+        의학적 진단이 아닙니다. 정확한 진단과 상담은 의사·의료기관에서 받으세요.
+      </div>
       {s.updated && (
         <div className="updated">마지막 저장: {new Date(s.updated).toLocaleString("ko-KR")}</div>
       )}
