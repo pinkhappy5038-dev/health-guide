@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  SECTIONS, PROFILE_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary,
+  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary,
 } from "./lib/health";
 import type { Item } from "./lib/health";
 
@@ -200,6 +200,14 @@ function InputForm({
           <h2>나에 대해</h2>
           <div className="body">
             {PROFILE_FIELDS.map((it) => (
+              <FieldRow key={it.key} it={it} value={draft[it.key] ?? ""} onField={onField} />
+            ))}
+          </div>
+        </div>
+        <div className="card">
+          <h2>생활 습관</h2>
+          <div className="body">
+            {HABIT_FIELDS.map((it) => (
               <FieldRow key={it.key} it={it} value={draft[it.key] ?? ""} onField={onField} />
             ))}
           </div>

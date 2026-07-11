@@ -76,6 +76,20 @@ export const PROFILE_FIELDS: Item[] = [
   { key: "nextCheckup", name: "다음 검진 예정", unit: "", type: "text", placeholder: "예: 2028년 1월" },
 ];
 
+// ===== 생활 습관 문진 (건강 수치 아님 — Part 9 미래 질환 위험에서 쓸 재료) =====
+export const HABIT_FIELDS: Item[] = [
+  { key: "exercise", name: "운동을 얼마나 하세요?", unit: "", type: "select",
+    options: ["거의 안 함", "주 1~2회", "주 3회 이상"] },
+  { key: "sweetDrink", name: "단 음료 자주 드세요?", unit: "", type: "select",
+    options: ["거의 안 마심", "가끔", "자주"] },
+  { key: "smoke", name: "담배 피우세요?", unit: "", type: "select",
+    options: ["안 피움", "끊음", "피움"] },
+  { key: "alcohol", name: "술을 얼마나 드세요?", unit: "", type: "select",
+    options: ["거의 안 마심", "가끔", "자주"] },
+  { key: "salty", name: "짜게 드시는 편이에요?", unit: "", type: "select",
+    options: ["싱겁게", "보통", "짜게"] },
+];
+
 // BMI는 키·몸무게로 자동 계산하는 특별 항목
 export function computeBMI(d: Record<string, string>): number | null {
   const h = parseFloat(d.height), w = parseFloat(d.weight);
