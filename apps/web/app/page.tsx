@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import {
   SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths, buildWarnings, buildLetter, buildTerms, buildJourneyLine, PHILOSOPHY,
-  DAILY_HABITS, HABITS_STORE_KEY, todayKey, computeStreak,
+  DAILY_HABITS, HABITS_STORE_KEY, todayKey, computeStreak, buildProject,
 } from "./lib/health";
 import type { HabitRecords } from "./lib/health";
 import type { Item } from "./lib/health";
@@ -128,6 +128,7 @@ function PartView({
          n === 3 ? <PridePart data={data} onInput={onInput} /> :
          n === 4 ? <WarnPart data={data} onInput={onInput} /> :
          n === 5 ? <TermsPart data={data} /> :
+         n === 6 ? <ProjectPart data={data} onInput={onInput} /> :
          n === 8 ? <HabitsPart /> :
          n === 10 ? <ClosingPart data={data} onPromise={onPromise} /> : (
           <div className="prep">
@@ -353,6 +354,63 @@ function TermsPart({ data }: { data: Data }) {
           </div>
         </div>
       ))}
+    </>
+  );
+}
+
+// ===== Part 6: 다음 검진까지 프로젝트 =====
+function ProjectPart({ data, onInput }: { data: Data; onInput: () => void }) {
+  const proj = buildProject(data);
+  if (proj === null) {
+    return (
+      <div className="empty">
+        검진 수치를 넣으면 나만의 프로젝트를 짜드릴게요.<br /><br />
+        <button className="btn-primary empty-btn" onClick={onInput}>검진 수치 입력하러 가기</button>
+      </div>
+    );
+  }
+  return (
+    <>
+      {proj.finish !== null ? (
+        <div className="finish-line">🏁 결승선: {proj.finish} 검진</div>
+      ) : (
+        <div className="missing-note">
+          다음 검진 예정을 입력하면 결승선이 생겨요.
+          <button className="btn-primary missing-btn" onClick={onInput}>입력하러 가기</button>
+        </div>
+      )}
+
+      {proj.allClear ? (
+        <div className="pride-intro">고칠 목표가 없어요! 지금을 그대로 유지하는 게 이번 프로젝트예요 🎉<br />매일의 실천은 Part 8 체크리스트와 함께해요.</div>
+      ) : (
+        <>
+          <div className="card">
+            <h2>🎯 목표 수치</h2>
+            <div className="body">
+              {proj.goals.map((g, i) => (
+                <div className="goal-row" key={i}>
+                  <span className={`sig ${g.status}`}>{g.status === "bad" ? "🔴" : "🟡"}</span>
+                  <span className="goal-name">{g.name}</span>
+                  <span className="goal-move">지금 <b>{g.current}</b> → 목표 <b>{g.target}</b></span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="card">
+            <h2>📅 이번 시즌 미션</h2>
+            <div className="body">
+              {proj.missions.map((m, i) => (
+                <div className="mission-row" key={i}>🎯 {m}</div>
+              ))}
+              <div className="mission-note">매일의 실천 체크는 Part 8(오늘의 체크리스트)에서 — 곧 이 미션들이 거기로 연결될 거예요.</div>
+            </div>
+          </div>
+        </>
+      )}
+      <div className="disclaimer">
+        목표·미션은 검진 수치를 바탕으로 한 생활 제안이며, 의학적 처방이 아닙니다.
+        약 복용·치료 중이라면 의사와 상의 후 실천하세요.
+      </div>
     </>
   );
 }

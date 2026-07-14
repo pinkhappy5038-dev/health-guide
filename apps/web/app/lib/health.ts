@@ -117,7 +117,7 @@ export const PARTS: Part[] = [
   { n: 3,  icon: "🛡️", title: "내 몸의 믿는 구석",        status: "live" },
   { n: 4,  icon: "⚠️", title: "내 몸에 보내는 경고",       status: "live" },
   { n: 5,  icon: "📖", title: "그게 무슨 뜻이에요?",       status: "live" },
-  { n: 6,  icon: "🎯", title: "다음 검진까지 프로젝트",     status: "prep" },
+  { n: 6,  icon: "🎯", title: "다음 검진까지 프로젝트",     status: "live" },
   { n: 7,  icon: "💊", title: "내 영양제, 잘 먹고 있나요?", status: "prep" },
   { n: 8,  icon: "🌱", title: "오늘부터 하는 건강습관",     status: "live" },
   { n: 9,  icon: "🔮", title: "앞으로 생길 가능성 높은 질환", status: "prep" },
@@ -388,6 +388,61 @@ export function buildLetter(data: Record<string, string>): Letter {
   paras.push(close);
   paras.push("— 당신의 건강을 지켜보는 가이드북 드림");
   return { paragraphs: paras };
+}
+
+// ===== Part 6: 다음 검진까지 프로젝트 (목표 수치 + 시즌 미션, 규칙 기반) =====
+// 문제 영역별 실천 미션 (연령 맞춤·AI 제안은 나중 단계)
+const AREA_MISSIONS: Record<string, string[]> = {
+  vascular: ["싱겁게 먹기 — 국물은 남기기", "주 3회, 30분 빠르게 걷기"],
+  glucose: ["단 음료 대신 물·차 마시기", "밥은 천천히 — 20분 이상 들여 먹기"],
+  liver: ["술 쉬는 날, 주 3일 만들기", "밤늦은 야식 줄이기"],
+  kidney: ["물 자주 마시기", "짜게 먹지 않기 (콩팥 부담 줄이기)"],
+  weight: ["저녁 9시 이후 안 먹기", "엘리베이터 대신 계단 이용"],
+  anemia: ["살코기·시금치 같은 철분 음식 챙겨 먹기"],
+};
+// 항목 → 영역 찾기 (미션 고르기용)
+function areaOfKey(key: string): string {
+  if (key === "hb") return "anemia";
+  if (key === "bmi") return "weight";
+  for (const a of SCORE_AREAS) if (a.itemKeys.includes(key)) return a.key;
+  return "";
+}
+// 목표 표시용 기준 (기존 ref 재사용, BMI만 별도)
+function targetOfKey(key: string, sex: string): string {
+  if (key === "bmi") return "18.5~22.9";
+  const it = ITEM_BY_KEY[key];
+  return it && it.ref ? it.ref(sex) : "";
+}
+
+export type ProjectGoal = { name: string; current: string; target: string; status: "warn" | "bad" };
+export type Project = {
+  finish: string | null;          // 다음 검진 예정 (없으면 null)
+  goals: ProjectGoal[];           // 최대 3개 (위험 먼저)
+  missions: string[];             // 중복 제거, 최대 4개
+  allClear: boolean;              // 문제 없음 = 유지 프로젝트
+} | null;                         // null = 수치 없음
+
+export function buildProject(data: Record<string, string>): Project {
+  if (!buildSummary(data).hasData) return null;
+  const sex = data.sex ?? "";
+  const warnings = buildWarnings(data); // 위험 먼저 정렬돼 있음
+  const goals: ProjectGoal[] = warnings.slice(0, 3).map((w) => ({
+    name: w.name,
+    current: w.key === "bmi" ? String(computeBMI(data)) : `${data[w.key]} ${ITEM_BY_KEY[w.key]?.unit ?? ""}`.trim(),
+    target: targetOfKey(w.key, sex),
+    status: w.status,
+  }));
+  const missions: string[] = [];
+  for (const w of warnings) {
+    for (const m of AREA_MISSIONS[areaOfKey(w.key)] ?? []) {
+      if (!missions.includes(m) && missions.length < 4) missions.push(m);
+    }
+  }
+  return {
+    finish: data.nextCheckup != null && data.nextCheckup !== "" ? data.nextCheckup : null,
+    goals, missions,
+    allClear: warnings.length === 0,
+  };
 }
 
 // ===== Part 8: 오늘부터 하는 건강습관 (매일 체크리스트) =====

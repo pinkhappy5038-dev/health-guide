@@ -108,6 +108,22 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .badge.bad  { background: #f8e0de; color: #b23a31; }
 .badge.none { background: #eef1f2; color: #aaa; }
 
+/* Part 6: 다음 검진까지 프로젝트 */
+.finish-line {
+  background: #2f6f5e; color: #fff; border-radius: 10px;
+  padding: 14px 16px; margin-bottom: 14px;
+  font-size: 16px; font-weight: 700; text-align: center;
+}
+.goal-row { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #f0f2f3; }
+.goal-row:last-child { border-bottom: 0; }
+.goal-row .sig { font-size: 14px; }
+.goal-name { font-size: 15px; font-weight: 700; flex: 1; }
+.goal-move { font-size: 14px; color: #5a6b64; }
+.goal-move b { color: #2f6f5e; }
+.mission-row { padding: 11px 0; border-bottom: 1px solid #f0f2f3; font-size: 15px; }
+.mission-row:last-of-type { border-bottom: 0; }
+.mission-note { margin-top: 10px; font-size: 13px; color: #9aa4a9; }
+
 /* Part 8: 오늘의 체크리스트 */
 .habit-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .habit-date { font-size: 15px; font-weight: 700; }
