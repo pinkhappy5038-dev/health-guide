@@ -108,6 +108,15 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .badge.bad  { background: #f8e0de; color: #b23a31; }
 .badge.none { background: #eef1f2; color: #aaa; }
 
+/* Part 1: 의사 선생님의 편지 */
+.letter {
+  background: #fffdf7; border: 1px solid #ece5d3; border-radius: 12px;
+  padding: 22px 20px; line-height: 1.9; font-size: 15px; color: #3d3a33;
+}
+.letter p { margin: 0 0 16px; }
+.letter p:last-child { margin-bottom: 0; }
+.letter .sign { text-align: right; color: #8a8272; font-size: 14px; }
+
 /* Part 4: 내 몸에 보내는 경고 */
 .warn-intro {
   background: #fbf0d8; border: 1px solid #f0dca8; color: #8a6212;

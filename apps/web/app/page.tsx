@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths, buildWarnings,
+  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths, buildWarnings, buildLetter,
 } from "./lib/health";
 import type { Item } from "./lib/health";
 
@@ -113,7 +113,8 @@ function PartView({
       </div>
       <div>
         <div className="part-title">{p.icon} {p.title}</div>
-        {n === 2 ? <SummaryView data={data} onInput={onInput} /> :
+        {n === 1 ? <LetterPart data={data} onInput={onInput} /> :
+         n === 2 ? <SummaryView data={data} onInput={onInput} /> :
          n === 3 ? <PridePart data={data} onInput={onInput} /> :
          n === 4 ? <WarnPart data={data} onInput={onInput} /> : (
           <div className="prep">
@@ -205,6 +206,32 @@ function SummaryView({ data, onInput }: { data: Data; onInput: () => void }) {
       {s.updated && (
         <div className="updated">마지막 저장: {new Date(s.updated).toLocaleString("ko-KR")}</div>
       )}
+    </>
+  );
+}
+
+// ===== Part 1: 의사 선생님의 편지 =====
+function LetterPart({ data, onInput }: { data: Data; onInput: () => void }) {
+  const letter = buildLetter(data);
+  if (letter === null) {
+    return (
+      <div className="empty">
+        검진 수치를 넣으면 편지를 써드릴게요.<br /><br />
+        <button className="btn-primary empty-btn" onClick={onInput}>검진 수치 입력하러 가기</button>
+      </div>
+    );
+  }
+  return (
+    <>
+      <div className="letter">
+        {letter.paragraphs.map((p, i) => (
+          <p key={i} className={i === letter.paragraphs.length - 1 ? "sign" : ""}>{p}</p>
+        ))}
+      </div>
+      <div className="disclaimer">
+        이 편지는 검진 수치를 쉽게 풀어 쓴 것이며, 의학적 진단이 아닙니다.
+        정확한 진단과 상담은 의사·의료기관에서 받으세요.
+      </div>
     </>
   );
 }

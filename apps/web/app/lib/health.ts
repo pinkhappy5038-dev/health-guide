@@ -112,7 +112,7 @@ export const STATUS_LABEL: Record<Status, string> = { good: "정상", warn: "주
 // status: 'live' = 지금 동작, 'prep' = 준비 중(내용은 다음에)
 export type Part = { n: number; icon: string; title: string; status: "live" | "prep" };
 export const PARTS: Part[] = [
-  { n: 1,  icon: "✉️", title: "의사 선생님의 편지",       status: "prep" },
+  { n: 1,  icon: "✉️", title: "의사 선생님의 편지",       status: "live" },
   { n: 2,  icon: "⭐", title: "내 건강 점수",             status: "live" },
   { n: 3,  icon: "🛡️", title: "내 몸의 믿는 구석",        status: "live" },
   { n: 4,  icon: "⚠️", title: "내 몸에 보내는 경고",       status: "live" },
@@ -259,6 +259,82 @@ export function buildWarnings(data: Record<string, string>): Warning[] {
   // 위험(bad) 먼저, 그다음 주의(warn)
   out.sort((a, b) => (a.status === b.status ? 0 : a.status === "bad" ? -1 : 1));
   return out;
+}
+
+// ===== Part 1: 의사 선생님의 편지 (규칙 기반 조립 — AI 연결은 나중) =====
+// 칭찬: 영역별 "몸이 잘하는 일"을 구체적으로 + 문진 답이 좋을 때만 습관을 연결(지어내지 않기).
+const PRAISE_BODY: Record<string, string> = {
+  vascular: "혈관이 깨끗하고 탄력을 잘 유지하고 있어요",
+  glucose: "몸이 당을 처리하는 힘이 좋아요",
+  liver: "간이 피로·해독 일을 잘 해내고 있어요",
+  kidney: "콩팥이 노폐물을 잘 걸러내고 있어요",
+  weight: "체중이 건강한 범위에 잘 있어요",
+};
+// 영역 정상 + 이 습관 답이면 → 이 문장을 덧붙인다
+const PRAISE_HABIT: Record<string, { habitKey: string; goodAnswer: string; line: string }[]> = {
+  liver: [{ habitKey: "alcohol", goodAnswer: "거의 안 마심", line: "술을 절제해오신 덕이 커요." }],
+  glucose: [{ habitKey: "sweetDrink", goodAnswer: "거의 안 마심", line: "단 음료를 멀리하신 게 그대로 나타나네요." }],
+  vascular: [
+    { habitKey: "exercise", goodAnswer: "주 3회 이상", line: "꾸준한 운동의 힘이에요." },
+    { habitKey: "salty", goodAnswer: "싱겁게", line: "싱겁게 드시는 습관이 혈관을 지켜주고 있어요." },
+  ],
+};
+
+export type Letter = { paragraphs: string[] } | null; // null = 수치 없음
+
+export function buildLetter(data: Record<string, string>): Letter {
+  const s = buildSummary(data);
+  if (!s.hasData) return null;
+  const total = s.good + s.warn + s.bad;
+  const warnings = buildWarnings(data);
+  const sex = data.sex ?? "";
+  const paras: string[] = [];
+
+  // ① 인사
+  paras.push("안녕하세요. 이번 검진 결과지를 저와 함께 차근차근 보시죠.");
+
+  // ② 전체 그림
+  let overview = `이번 검진에서 ${total}개 항목을 살펴봤어요. 정상 ${s.good}개, 주의 ${s.warn}개, 위험 ${s.bad}개예요.`;
+  if (s.bad + s.warn === 0) overview += " 아주 잘 관리되고 있어요. 이대로만 가면 됩니다.";
+  else overview += " 숫자만 보면 걱정되실 수 있지만, 하나씩 보면 생각보다 괜찮아요.";
+  paras.push(overview);
+
+  // ③ 칭찬 (영역 전체가 정상일 때 — 구체적으로 + 습관 연결)
+  const praise: string[] = [];
+  for (const area of SCORE_AREAS) {
+    const sts = area.itemKeys.map((k) => statusOfKey(k, data, sex)).filter((x) => x !== null);
+    if (sts.length && sts.every((x) => x === "good")) {
+      let line = PRAISE_BODY[area.key] ?? `${area.name}이(가) 잘 유지되고 있어요`;
+      for (const h of PRAISE_HABIT[area.key] ?? []) {
+        if (data[h.habitKey] === h.goodAnswer) { line += ". " + h.line.replace(/\.$/, ""); break; }
+      }
+      praise.push(line);
+    }
+  }
+  if (praise.length) paras.push("먼저 잘 지켜온 것부터 볼게요. " + praise.join(". ") + ".");
+
+  // ④ 신경 쓸 것 (위험 먼저 정렬돼 있음, 최대 3개만 편지에)
+  // 한글 받침 유무에 따라 은/는, 이/가 자동 선택
+  const josa = (word: string, withBatchim: string, without: string) => {
+    const ch = word.replace(/[^가-힣]/g, "").slice(-1);
+    if (!ch) return word + without;
+    return word + (((ch.charCodeAt(0) - 0xac00) % 28) > 0 ? withBatchim : without);
+  };
+  if (warnings.length) {
+    const top = warnings.slice(0, 3);
+    const lines = top.map((w) => `${w.status === "bad" ? josa(w.name, "은", "는") + " 지금 챙겨야 할 수준이에요" : josa(w.name, "이", "가") + " 조금 높게 나왔어요"}. ${w.msg}`);
+    let att = "이제 같이 신경 쓸 것을 볼게요. " + lines.join(". ") + ".";
+    if (warnings.length > 3) att += ` (자세한 건 Part 4에 ${warnings.length}개 모두 정리해뒀어요.)`;
+    att += " 놀라실 일은 아니지만, 이번 기회에 챙겨보면 좋겠어요.";
+    paras.push(att);
+  }
+
+  // ⑤ 마무리 격려 (+ 다음 검진일)
+  let close = "건강은 하루아침에 무너지지 않아요. 오늘부터 작은 것 하나씩이면 충분합니다.";
+  if (data.nextCheckup) close += ` 다음 검진(${data.nextCheckup}) 때 더 좋아진 결과지로 만나요.`;
+  paras.push(close);
+  paras.push("— 당신의 건강을 지켜보는 가이드북 드림");
+  return { paragraphs: paras };
 }
 
 export function buildScores(data: Record<string, string>): AreaScore[] {
