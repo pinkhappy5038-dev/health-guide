@@ -108,14 +108,30 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .badge.bad  { background: #f8e0de; color: #b23a31; }
 .badge.none { background: #eef1f2; color: #aaa; }
 
-/* Part 1: 의사 선생님의 편지 */
+/* Part 1: 의사 선생님의 편지 — 편지지 느낌 */
 .letter {
-  background: #fffdf7; border: 1px solid #ece5d3; border-radius: 12px;
-  padding: 22px 20px; line-height: 1.9; font-size: 15px; color: #3d3a33;
+  position: relative;
+  background-color: #fffdf4;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 33px, #eee3c8 33px, #eee3c8 34px);
+  background-origin: content-box;
+  border: 1px solid #e6dcc2; border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(120, 100, 40, 0.10), 0 1px 0 #fff inset;
+  padding: 68px 24px 28px;
+  line-height: 34px; font-size: 16px; color: #40392c;
+  font-family: "Nanum Myeongjo", "AppleMyungjo", "Batang", Georgia, serif;
 }
-.letter p { margin: 0 0 16px; }
+.letter::before {
+  content: "💌";
+  position: absolute; top: 16px; right: 18px;
+  font-size: 22px; line-height: 1;
+  padding: 8px 9px; background: #fff;
+  border: 2px dashed #d8c9a0; border-radius: 4px;
+  transform: rotate(4deg);
+}
+.letter p { margin: 0 0 34px; }
 .letter p:last-child { margin-bottom: 0; }
-.letter .sign { text-align: right; color: #8a8272; font-size: 14px; }
+.letter .date { text-align: right; color: #9a8f74; font-size: 14px; margin-bottom: 0; }
+.letter .sign { text-align: right; color: #8a8272; font-size: 15px; }
 
 /* Part 4: 내 몸에 보내는 경고 */
 .warn-intro {

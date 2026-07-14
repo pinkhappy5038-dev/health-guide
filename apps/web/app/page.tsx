@@ -221,12 +221,17 @@ function LetterPart({ data, onInput }: { data: Data; onInput: () => void }) {
       </div>
     );
   }
+  const dateStr = data._updated
+    ? new Date(data._updated).toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })
+    : "";
+  const body = letter.paragraphs.slice(0, -1);
+  const sign = letter.paragraphs[letter.paragraphs.length - 1];
   return (
     <>
       <div className="letter">
-        {letter.paragraphs.map((p, i) => (
-          <p key={i} className={i === letter.paragraphs.length - 1 ? "sign" : ""}>{p}</p>
-        ))}
+        {body.map((p, i) => <p key={i}>{p}</p>)}
+        {dateStr !== "" && <p className="date">{dateStr}</p>}
+        <p className="sign">{sign}</p>
       </div>
       <div className="disclaimer">
         이 편지는 검진 수치를 쉽게 풀어 쓴 것이며, 의학적 진단이 아닙니다.
