@@ -108,6 +108,15 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .badge.bad  { background: #f8e0de; color: #b23a31; }
 .badge.none { background: #eef1f2; color: #aaa; }
 
+/* Part 9: 갈림길 (1·5·10년) */
+.risk-row { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f2f3; align-items: baseline; }
+.risk-row .yr { width: 56px; flex-shrink: 0; font-size: 13px; font-weight: 700; color: #a9761a; }
+.risk-row .tx { font-size: 14px; color: #4a5550; line-height: 1.6; }
+.risk-change {
+  margin-top: 12px; background: #e1f5ee; border-radius: 8px;
+  padding: 12px 14px; font-size: 14px; color: #0f6e56; line-height: 1.6;
+}
+
 /* Part 6: 다음 검진까지 프로젝트 */
 .finish-line {
   background: #2f6f5e; color: #fff; border-radius: 10px;

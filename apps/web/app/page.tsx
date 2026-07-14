@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import {
   SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths, buildWarnings, buildLetter, buildTerms, buildJourneyLine, PHILOSOPHY,
-  DAILY_HABITS, HABITS_STORE_KEY, todayKey, computeStreak, buildProject,
+  DAILY_HABITS, HABITS_STORE_KEY, todayKey, computeStreak, buildProject, buildRisks,
 } from "./lib/health";
 import type { HabitRecords } from "./lib/health";
 import type { Item } from "./lib/health";
@@ -130,6 +130,7 @@ function PartView({
          n === 5 ? <TermsPart data={data} /> :
          n === 6 ? <ProjectPart data={data} onInput={onInput} /> :
          n === 8 ? <HabitsPart /> :
+         n === 9 ? <RisksPart data={data} onInput={onInput} /> :
          n === 10 ? <ClosingPart data={data} onPromise={onPromise} /> : (
           <div className="prep">
             <div className="big">{p.icon}</div>
@@ -470,6 +471,51 @@ function HabitsPart() {
         <div className="pride-intro">오늘 것 다 해냈어요! 내일 또 만나요 🎉</div>
       )}
       <div className="habit-note">작게 시작하는 게 비결이에요. 습관이 자리 잡으면 하나씩 늘려가요.</div>
+    </>
+  );
+}
+
+// ===== Part 9: 앞으로 생길 가능성 높은 질환 (갈림길) =====
+function RisksPart({ data, onInput }: { data: Data; onInput: () => void }) {
+  const risks = buildRisks(data);
+  if (risks === null) {
+    return (
+      <div className="empty">
+        검진 수치와 생활 습관을 넣으면 나의 갈림길을 보여드릴게요.<br /><br />
+        <button className="btn-primary empty-btn" onClick={onInput}>검진 수치 입력하러 가기</button>
+      </div>
+    );
+  }
+  if (risks.paths.length === 0) {
+    return (
+      <div className="pride-intro">
+        지금 궤도라면 큰 위험 신호가 없어요! 🎉<br />
+        이 길을 그대로 걸으면 돼요 — Part 8 체크리스트가 함께할 거예요.
+      </div>
+    );
+  }
+  return (
+    <>
+      <div className="warn-intro">
+        이건 예언이 아니라, 지금 습관이 계속될 때의 이야기예요. 그리고 — 갈림길마다 다른 길이 있어요.
+      </div>
+      {risks.ageNote !== null && <div className="journey">{risks.ageNote}</div>}
+      {risks.paths.map((p, i) => (
+        <div className="card" key={i}>
+          <h2>{p.icon} {p.title} — 이대로 가면</h2>
+          <div className="body">
+            <div className="risk-row"><span className="yr">1년 뒤</span><span className="tx">{p.y1}</span></div>
+            <div className="risk-row"><span className="yr">5년 뒤</span><span className="tx">{p.y5}</span></div>
+            <div className="risk-row"><span className="yr">10년 뒤</span><span className="tx">{p.y10}</span></div>
+            <div className="risk-change">💚 바꾸면: {p.change}</div>
+          </div>
+        </div>
+      ))}
+      <div className="see-you">그 갈림길의 시작이 Part 6 프로젝트예요 🎯</div>
+      <div className="disclaimer">
+        위 내용은 통계적 경향을 바탕으로 한 생활 안내이며, 의학적 예측·진단이 아닙니다.
+        정확한 평가는 의사·의료기관에서 받으세요.
+      </div>
     </>
   );
 }

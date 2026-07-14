@@ -120,7 +120,7 @@ export const PARTS: Part[] = [
   { n: 6,  icon: "🎯", title: "다음 검진까지 프로젝트",     status: "live" },
   { n: 7,  icon: "💊", title: "내 영양제, 잘 먹고 있나요?", status: "prep" },
   { n: 8,  icon: "🌱", title: "오늘부터 하는 건강습관",     status: "live" },
-  { n: 9,  icon: "🔮", title: "앞으로 생길 가능성 높은 질환", status: "prep" },
+  { n: 9,  icon: "🔮", title: "앞으로 생길 가능성 높은 질환", status: "live" },
   { n: 10, icon: "🤝", title: "의사의 마지막 이야기",       status: "live" },
 ];
 export function partByNum(n: number): Part {
@@ -388,6 +388,68 @@ export function buildLetter(data: Record<string, string>): Letter {
   paras.push(close);
   paras.push("— 당신의 건강을 지켜보는 가이드북 드림");
   return { paragraphs: paras };
+}
+
+// ===== Part 9: 앞으로 생길 가능성 높은 질환 (갈림길, 규칙 기반 — AI 업그레이드는 나중) =====
+export type RiskPath = { icon: string; title: string; y1: string; y5: string; y10: string; change: string };
+
+export function buildRisks(data: Record<string, string>): { paths: RiskPath[]; ageNote: string | null } | null {
+  if (!buildSummary(data).hasData) return null;
+  const sex = data.sex ?? "";
+  const isBadOrWarn = (k: string) => { const s = statusOfKey(k, data, sex); return s === "warn" || s === "bad"; };
+  const paths: RiskPath[] = [];
+
+  if (isBadOrWarn("glucose") || data.sweetDrink === "자주") {
+    paths.push({ icon: "🍬", title: "혈당 경로",
+      y1: "체중 증가와 함께 혈당이 더 오르기 쉬워요",
+      y5: "당뇨 전단계를 지나 제2형 당뇨로 들어설 위험이 커져요",
+      y10: "당뇨 합병증(눈·콩팥·신경) 위험까지 이어질 수 있어요",
+      change: "단 음료만 끊어도 이 경로에서 내려올 수 있어요. 지금이 되돌리기 가장 쉬운 때예요." });
+  }
+  if (["sbp", "dbp", "tchol", "ldl", "tg", "hdl"].some(isBadOrWarn) || data.salty === "짜게") {
+    paths.push({ icon: "🫀", title: "혈관 경로",
+      y1: "혈관 벽의 부담과 기름때가 조용히 쌓여가요",
+      y5: "고혈압이 굳어지고 동맥경화가 진행될 수 있어요",
+      y10: "심근경색·뇌졸중 같은 큰 사고의 위험이 올라가요",
+      change: "싱겁게 먹기 + 주 3회 걷기 — 이 둘이면 혈관은 다시 부드러워지기 시작해요." });
+  }
+  if (["ast", "alt", "ggt"].some(isBadOrWarn) || data.alcohol === "자주") {
+    paths.push({ icon: "🫁", title: "간 경로",
+      y1: "지방간이 생기거나 깊어질 수 있어요",
+      y5: "간염·간기능 저하로 이어질 위험이 있어요",
+      y10: "간경변처럼 되돌리기 어려운 단계의 위험이 커져요",
+      change: "술 쉬는 날을 주 3일만 만들어도 간은 그날부터 회복을 시작해요." });
+  }
+  if (isBadOrWarn("bmi") || isBadOrWarn("waist")) {
+    paths.push({ icon: "⚖️", title: "체중 경로",
+      y1: "지금 습관이 그대로면 체중은 조금씩 더 늘어요",
+      y5: "당뇨·고혈압이 함께 오는 몸이 되기 쉬워요",
+      y10: "무릎 관절과 심장이 무게를 견디느라 지쳐가요",
+      change: "저녁 9시 이후 안 먹기 — 이 하나가 체중 곡선을 꺾는 첫 단추예요." });
+  }
+  if (data.smoke === "피움") {
+    paths.push({ icon: "🚬", title: "흡연 경로",
+      y1: "폐 기능이 조금씩 떨어지기 시작해요",
+      y5: "만성 기관지염과 혈관 손상이 진행돼요",
+      y10: "폐암·심혈관 질환 위험이 크게 올라가요",
+      change: "몸은 담배를 끊는 그 순간부터 회복을 시작해요. 늦은 때는 없어요." });
+  }
+  if (["cr", "egfr"].some(isBadOrWarn)) {
+    paths.push({ icon: "🫘", title: "콩팥 경로",
+      y1: "콩팥의 거르는 힘이 서서히 떨어질 수 있어요",
+      y5: "만성콩팥병으로 진행될 위험이 있어요",
+      y10: "투석까지 가는 길을 미리 막는 게 중요해요",
+      change: "짜게 먹지 않기 + 혈압 관리 — 콩팥을 지키는 두 기둥이에요." });
+  }
+
+  // 연령 한 줄 (출생연도 있을 때만)
+  let ageNote: string | null = null;
+  const by = parseInt(data.birthYear ?? "", 10);
+  if (!isNaN(by)) {
+    const age = new Date().getFullYear() - by;
+    if (age >= 50 && paths.length > 0) ageNote = `${age}세부터는 같은 습관이라도 몸에 쌓이는 속도가 빨라져요. 그래서 지금 바꾸는 게 더 값져요.`;
+  }
+  return { paths, ageNote };
 }
 
 // ===== Part 6: 다음 검진까지 프로젝트 (목표 수치 + 시즌 미션, 규칙 기반) =====
