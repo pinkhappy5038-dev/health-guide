@@ -114,7 +114,7 @@ export type Part = { n: number; icon: string; title: string; status: "live" | "p
 export const PARTS: Part[] = [
   { n: 1,  icon: "✉️", title: "의사 선생님의 편지",       status: "prep" },
   { n: 2,  icon: "⭐", title: "내 건강 점수",             status: "live" },
-  { n: 3,  icon: "🛡️", title: "내 몸의 믿는 구석",        status: "prep" },
+  { n: 3,  icon: "🛡️", title: "내 몸의 믿는 구석",        status: "live" },
   { n: 4,  icon: "⚠️", title: "내 몸에 보내는 경고",       status: "prep" },
   { n: 5,  icon: "📖", title: "그게 무슨 뜻이에요?",       status: "prep" },
   { n: 6,  icon: "🎯", title: "다음 검진까지 프로젝트",     status: "prep" },
@@ -204,6 +204,27 @@ function statusOfKey(key: string, data: Record<string, string>, sex: string): St
   const num = parseFloat(raw);
   if (isNaN(num)) return null;
   return it.eval(num, sex);
+}
+
+// ===== Part 3: 내 몸의 믿는 구석 (정상 판정 항목만 모으기) =====
+export type StrengthArea = { key: string; name: string; icon: string; goodItems: string[] };
+
+function nameOfKey(key: string): string {
+  if (key === "bmi") return "BMI(체질량지수)";
+  return ITEM_BY_KEY[key]?.name ?? key;
+}
+
+export function buildStrengths(data: Record<string, string>): StrengthArea[] {
+  const sex = data.sex ?? "";
+  const out: StrengthArea[] = [];
+  for (const area of SCORE_AREAS) {
+    const goodItems: string[] = [];
+    for (const k of area.itemKeys) {
+      if (statusOfKey(k, data, sex) === "good") goodItems.push(nameOfKey(k));
+    }
+    if (goodItems.length) out.push({ key: area.key, name: area.name, icon: area.icon, goodItems });
+  }
+  return out;
 }
 
 export function buildScores(data: Record<string, string>): AreaScore[] {

@@ -108,6 +108,17 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .badge.bad  { background: #f8e0de; color: #b23a31; }
 .badge.none { background: #eef1f2; color: #aaa; }
 
+/* Part 3: 내 몸의 믿는 구석 */
+.pride-intro {
+  background: #e1f5ee; border: 1px solid #bfe6d8; color: #0f6e56;
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; font-size: 15px; line-height: 1.6;
+}
+.pride-item { display: flex; align-items: center; padding: 11px 0; border-bottom: 1px solid #f0f2f3; gap: 10px; }
+.pride-item:last-child { border-bottom: 0; }
+.pride-item .ck { font-size: 16px; }
+.pride-item .nm { flex: 1; font-size: 15px; }
+.pride-item .ok { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 20px; background: #e2f3ea; color: #2c8156; }
+
 /* Part 2: 영역별 점수 + 별점 */
 .score-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f2f3; gap: 10px; }
 .score-row:last-child { border-bottom: 0; }

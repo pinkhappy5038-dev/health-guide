@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores,
+  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths,
 } from "./lib/health";
 import type { Item } from "./lib/health";
 
@@ -113,7 +113,8 @@ function PartView({
       </div>
       <div>
         <div className="part-title">{p.icon} {p.title}</div>
-        {n === 2 ? <SummaryView data={data} onInput={onInput} /> : (
+        {n === 2 ? <SummaryView data={data} onInput={onInput} /> :
+         n === 3 ? <PridePart data={data} onInput={onInput} /> : (
           <div className="prep">
             <div className="big">{p.icon}</div>
             <div className="t">준비 중이에요</div>
@@ -203,6 +204,39 @@ function SummaryView({ data, onInput }: { data: Data; onInput: () => void }) {
       {s.updated && (
         <div className="updated">마지막 저장: {new Date(s.updated).toLocaleString("ko-KR")}</div>
       )}
+    </>
+  );
+}
+
+// ===== Part 3: 내 몸의 믿는 구석 =====
+function PridePart({ data, onInput }: { data: Data; onInput: () => void }) {
+  const strengths = buildStrengths(data);
+  if (!strengths.length) {
+    return (
+      <div className="empty">
+        아직 정상으로 나온 항목이 없어요.<br />
+        검진 수치를 넣으면 잘하고 있는 것부터 보여드릴게요.<br /><br />
+        <button className="btn-primary empty-btn" onClick={onInput}>검진 수치 입력하러 가기</button>
+      </div>
+    );
+  }
+  return (
+    <>
+      <div className="pride-intro">잘하고 있는 것부터 볼게요 — 당신이 잘 지켜온 거예요. 💪</div>
+      {strengths.map((a) => (
+        <div className="card" key={a.key}>
+          <h2>{a.icon} {a.name}</h2>
+          <div className="body">
+            {a.goodItems.map((nm, i) => (
+              <div className="pride-item" key={i}>
+                <span className="ck">✅</span>
+                <span className="nm">{nm}</span>
+                <span className="ok">정상</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </>
   );
 }
