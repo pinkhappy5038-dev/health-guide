@@ -108,6 +108,29 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .badge.bad  { background: #f8e0de; color: #b23a31; }
 .badge.none { background: #eef1f2; color: #aaa; }
 
+/* Part 10: 마지막 이야기 & 약속 */
+.philosophy {
+  background: #fffdf4; border: 1px solid #e6dcc2; border-radius: 12px;
+  padding: 24px 22px; margin-bottom: 14px;
+  font-family: "Nanum Myeongjo", "AppleMyungjo", "Batang", Georgia, serif;
+  font-size: 17px; line-height: 1.9; color: #40392c; text-align: center;
+}
+.journey {
+  background: #e1f5ee; border: 1px solid #bfe6d8; color: #0f6e56;
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; font-size: 15px; line-height: 1.6;
+}
+.promise-q { margin: 6px 0 10px; font-size: 15px; }
+.promise-input {
+  width: 100%; padding: 13px 14px; border: 1px solid #cdd3d7; border-radius: 8px;
+  font-size: 16px; margin-bottom: 10px;
+}
+.promise-btn { width: 100%; padding: 13px; border: 0; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 8px; }
+.promise-saved {
+  margin: 8px 0 6px; font-size: 18px; text-align: center; color: #2f6f5e; font-weight: 700; line-height: 1.6;
+}
+.promise-note { margin: 0 0 12px; font-size: 13px; color: #9aa4a9; text-align: center; }
+.see-you { text-align: center; font-size: 16px; font-weight: 700; color: #2f6f5e; padding: 18px 0 6px; }
+
 /* Part 5: 용어 사전 */
 .term { padding: 13px 0; border-bottom: 1px solid #f0f2f3; }
 .term:last-child { border-bottom: 0; }

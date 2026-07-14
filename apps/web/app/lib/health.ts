@@ -121,7 +121,7 @@ export const PARTS: Part[] = [
   { n: 7,  icon: "💊", title: "내 영양제, 잘 먹고 있나요?", status: "prep" },
   { n: 8,  icon: "🌱", title: "오늘부터 하는 건강습관",     status: "prep" },
   { n: 9,  icon: "🔮", title: "앞으로 생길 가능성 높은 질환", status: "prep" },
-  { n: 10, icon: "🤝", title: "의사의 마지막 이야기",       status: "prep" },
+  { n: 10, icon: "🤝", title: "의사의 마지막 이야기",       status: "live" },
 ];
 export function partByNum(n: number): Part {
   return PARTS.find((p) => p.n === n)!;
@@ -388,6 +388,23 @@ export function buildLetter(data: Record<string, string>): Letter {
   paras.push(close);
   paras.push("— 당신의 건강을 지켜보는 가이드북 드림");
   return { paragraphs: paras };
+}
+
+// ===== Part 10: 의사의 마지막 이야기 =====
+export const PHILOSOPHY =
+  "건강은 하루아침에 무너지지 않습니다. 반대로 건강도 하루아침에 만들어지지 않습니다. 오늘의 작은 습관 하나가 10년 뒤의 건강한 나를 만듭니다.";
+
+// "당신의 믿는 구석은 ○○이었고, 챙길 것은 ○○이었습니다" — 수치 없으면 null
+export function buildJourneyLine(data: Record<string, string>): string | null {
+  if (!buildSummary(data).hasData) return null;
+  const goodAreas = buildStrengths(data).map((a) => a.name);
+  const warnNames = [...new Set(buildWarnings(data).map((w) => w.name))];
+  if (!goodAreas.length && !warnNames.length) return null;
+  const parts: string[] = [];
+  if (goodAreas.length) parts.push(`당신의 믿는 구석은 ${goodAreas.join("·")}이었고`);
+  if (warnNames.length) parts.push(`${goodAreas.length ? "챙길" : "당신이 챙길"} 것은 ${warnNames.slice(0, 3).join("·")}이었습니다`);
+  else parts.push("특별히 챙길 것 없이 잘 지내고 계셨습니다");
+  return parts.join(", ") + ". 이제 어디를 보면 되는지 아시죠?";
 }
 
 export function buildScores(data: Record<string, string>): AreaScore[] {

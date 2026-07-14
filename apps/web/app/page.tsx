@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths, buildWarnings, buildLetter, buildTerms,
+  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths, buildWarnings, buildLetter, buildTerms, buildJourneyLine, PHILOSOPHY,
 } from "./lib/health";
 import type { Item } from "./lib/health";
 
@@ -56,6 +56,13 @@ export default function Home() {
     setDraft((d) => ({ ...d, [key]: value }));
   }
 
+  // Part 10: 나와의 약속 한 줄 저장 (검진 데이터와 함께 보관)
+  function savePromise(text: string) {
+    const next: Data = { ...data, promise: text, _updated: new Date().toISOString() };
+    localStorage.setItem(STORE_KEY, JSON.stringify(next));
+    setData(next);
+  }
+
   return (
     <>
       <header>
@@ -66,7 +73,7 @@ export default function Home() {
       <main>
         {screen === "toc" && <Toc onPart={goPart} onInput={goInput} />}
         {screen === "part" && (
-          <PartView n={part} data={data} onToc={goToc} onPrev={prevPart} onNext={nextPart} onInput={goInput} />
+          <PartView n={part} data={data} onToc={goToc} onPrev={prevPart} onNext={nextPart} onInput={goInput} onPromise={savePromise} />
         )}
         {screen === "input" && (
           <InputForm draft={draft} onField={setField} onToc={goToc} onReset={resetForm} onSave={save} />
@@ -100,9 +107,10 @@ function Toc({ onPart, onInput }: { onPart: (n: number) => void; onInput: () => 
 
 // ===== 파트 화면 =====
 function PartView({
-  n, data, onToc, onPrev, onNext, onInput,
+  n, data, onToc, onPrev, onNext, onInput, onPromise,
 }: {
   n: number; data: Data; onToc: () => void; onPrev: () => void; onNext: () => void; onInput: () => void;
+  onPromise: (text: string) => void;
 }) {
   const p = partByNum(n);
   return (
@@ -117,7 +125,8 @@ function PartView({
          n === 2 ? <SummaryView data={data} onInput={onInput} /> :
          n === 3 ? <PridePart data={data} onInput={onInput} /> :
          n === 4 ? <WarnPart data={data} onInput={onInput} /> :
-         n === 5 ? <TermsPart data={data} /> : (
+         n === 5 ? <TermsPart data={data} /> :
+         n === 10 ? <ClosingPart data={data} onPromise={onPromise} /> : (
           <div className="prep">
             <div className="big">{p.icon}</div>
             <div className="t">준비 중이에요</div>
@@ -341,6 +350,50 @@ function TermsPart({ data }: { data: Data }) {
           </div>
         </div>
       ))}
+    </>
+  );
+}
+
+// ===== Part 10: 의사의 마지막 이야기 & 나와의 약속 =====
+function ClosingPart({ data, onPromise }: { data: Data; onPromise: (text: string) => void }) {
+  const journey = buildJourneyLine(data);
+  const saved = data.promise ?? "";
+  const [text, setText] = useState(saved);
+  const [editing, setEditing] = useState(saved === "");
+  return (
+    <>
+      <div className="philosophy">“{PHILOSOPHY}”</div>
+      {journey !== null && <div className="journey">{journey}</div>}
+
+      <div className="card">
+        <h2>✍️ 나와의 약속 한 줄</h2>
+        <div className="body">
+          {editing ? (
+            <>
+              <p className="promise-q">다음 검진까지, 딱 하나만 약속한다면?</p>
+              <input
+                className="promise-input" type="text" value={text}
+                placeholder="예: 저녁 9시 이후엔 안 먹는다"
+                onChange={(e) => setText(e.target.value)}
+              />
+              <button
+                className="btn-primary promise-btn"
+                onClick={() => { if (text.trim() !== "") { onPromise(text.trim()); setEditing(false); } }}
+              >약속 저장하기</button>
+            </>
+          ) : (
+            <>
+              <p className="promise-saved">“{saved}”</p>
+              <p className="promise-note">이 약속은 저장됐어요. 다음 검진 결과를 넣는 날, 다시 보여드릴게요.</p>
+              <button className="btn-ghost promise-btn" onClick={() => setEditing(true)}>약속 고치기</button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {data.nextCheckup !== undefined && data.nextCheckup !== "" && (
+        <div className="see-you">다음 검진에서 만나요 — {data.nextCheckup} 🤝</div>
+      )}
     </>
   );
 }
