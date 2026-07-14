@@ -108,6 +108,27 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .badge.bad  { background: #f8e0de; color: #b23a31; }
 .badge.none { background: #eef1f2; color: #aaa; }
 
+/* Part 8: 오늘의 체크리스트 */
+.habit-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.habit-date { font-size: 15px; font-weight: 700; }
+.habit-count { font-size: 14px; color: #2f6f5e; font-weight: 700; }
+.streak {
+  background: #fff4e3; border: 1px solid #f4dcb5; color: #a05f0a;
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;
+  font-size: 15px; font-weight: 700; text-align: center;
+}
+.habit-row {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 16px 6px; border: 0; background: none; cursor: pointer;
+  border-bottom: 1px solid #f0f2f3; font-size: 16px; text-align: left;
+}
+.habit-row:last-child { border-bottom: 0; }
+.habit-row .box { font-size: 22px; }
+.habit-row .ic { font-size: 20px; }
+.habit-row .label { flex: 1; }
+.habit-row.on .label { color: #2f6f5e; text-decoration: line-through; text-decoration-color: #9fc9ba; }
+.habit-note { text-align: center; font-size: 13px; color: #9aa4a9; margin-top: 12px; }
+
 /* Part 10: 마지막 이야기 & 약속 */
 .philosophy {
   background: #fffdf4; border: 1px solid #e6dcc2; border-radius: 12px;

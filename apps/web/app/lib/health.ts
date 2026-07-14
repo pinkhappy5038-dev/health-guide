@@ -119,7 +119,7 @@ export const PARTS: Part[] = [
   { n: 5,  icon: "📖", title: "그게 무슨 뜻이에요?",       status: "live" },
   { n: 6,  icon: "🎯", title: "다음 검진까지 프로젝트",     status: "prep" },
   { n: 7,  icon: "💊", title: "내 영양제, 잘 먹고 있나요?", status: "prep" },
-  { n: 8,  icon: "🌱", title: "오늘부터 하는 건강습관",     status: "prep" },
+  { n: 8,  icon: "🌱", title: "오늘부터 하는 건강습관",     status: "live" },
   { n: 9,  icon: "🔮", title: "앞으로 생길 가능성 높은 질환", status: "prep" },
   { n: 10, icon: "🤝", title: "의사의 마지막 이야기",       status: "live" },
 ];
@@ -388,6 +388,43 @@ export function buildLetter(data: Record<string, string>): Letter {
   paras.push(close);
   paras.push("— 당신의 건강을 지켜보는 가이드북 드림");
   return { paragraphs: paras };
+}
+
+// ===== Part 8: 오늘부터 하는 건강습관 (매일 체크리스트) =====
+export const HABITS_STORE_KEY = "health-guide-habits";
+export const DAILY_HABITS: { key: string; label: string; icon: string }[] = [
+  { key: "water", label: "아침에 일어나 물 한 컵", icon: "💧" },
+  { key: "walk", label: "하루 30분 걷기", icon: "🚶" },
+  { key: "nosnack", label: "저녁 9시 이후 안 먹기", icon: "🌙" },
+];
+
+// 오늘 날짜를 "2026-07-14" 형태로 (컴퓨터의 현지 날짜 기준)
+export function todayKey(): string {
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+export type HabitRecords = Record<string, Record<string, boolean>>; // 날짜 → (습관key → 체크)
+
+// 하루 "달성" = 그날 습관을 전부 체크. 연속 달성일 계산 —
+// 오늘 달성이면 오늘부터, 아니면 어제부터 거꾸로 센다 (오늘은 아직 진행 중이니까).
+export function computeStreak(records: HabitRecords): number {
+  const done = (dateKey: string) => {
+    const day = records[dateKey];
+    return day != null && DAILY_HABITS.every((h) => day[h.key] === true);
+  };
+  const d = new Date();
+  if (!done(todayKey())) d.setDate(d.getDate() - 1); // 오늘 미달성이면 어제부터
+  let streak = 0;
+  const p = (n: number) => String(n).padStart(2, "0");
+  while (true) {
+    const key = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    if (!done(key)) break;
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
 }
 
 // ===== Part 10: 의사의 마지막 이야기 =====

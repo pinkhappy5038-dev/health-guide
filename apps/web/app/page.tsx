@@ -6,7 +6,9 @@
 import { useEffect, useState } from "react";
 import {
   SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths, buildWarnings, buildLetter, buildTerms, buildJourneyLine, PHILOSOPHY,
+  DAILY_HABITS, HABITS_STORE_KEY, todayKey, computeStreak,
 } from "./lib/health";
+import type { HabitRecords } from "./lib/health";
 import type { Item } from "./lib/health";
 
 type Data = Record<string, string>;
@@ -126,6 +128,7 @@ function PartView({
          n === 3 ? <PridePart data={data} onInput={onInput} /> :
          n === 4 ? <WarnPart data={data} onInput={onInput} /> :
          n === 5 ? <TermsPart data={data} /> :
+         n === 8 ? <HabitsPart /> :
          n === 10 ? <ClosingPart data={data} onPromise={onPromise} /> : (
           <div className="prep">
             <div className="big">{p.icon}</div>
@@ -350,6 +353,65 @@ function TermsPart({ data }: { data: Data }) {
           </div>
         </div>
       ))}
+    </>
+  );
+}
+
+// ===== Part 8: 오늘부터 하는 건강습관 (매일 체크리스트) =====
+function HabitsPart() {
+  const [records, setRecords] = useState<HabitRecords>({});
+  // 처음 한 번: 저장된 체크 기록 불러오기
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(HABITS_STORE_KEY);
+      if (raw) setRecords(JSON.parse(raw));
+    } catch { /* 깨졌으면 빈 기록으로 시작 */ }
+  }, []);
+
+  const today = todayKey();
+  const todayChecks = records[today] ?? {};
+  const doneCount = DAILY_HABITS.filter((h) => todayChecks[h.key] === true).length;
+  const streak = computeStreak(records);
+
+  function toggle(key: string) {
+    // 항상 "직전 상태" 기준으로 계산 — 연달아 눌러도 체크가 안 사라진다
+    setRecords((prev) => {
+      const day = prev[today] ?? {};
+      const nextDay = { ...day, [key]: !(day[key] === true) };
+      const next = { ...prev, [today]: nextDay };
+      localStorage.setItem(HABITS_STORE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  const d = new Date();
+  const dateLabel = d.toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" });
+
+  return (
+    <>
+      <div className="habit-head">
+        <span className="habit-date">오늘 · {dateLabel}</span>
+        <span className="habit-count">{doneCount} / {DAILY_HABITS.length} 완료</span>
+      </div>
+      {streak > 0 && <div className="streak">🔥 {streak}일 연속 달성 중!</div>}
+      <div className="card">
+        <div className="body">
+          {DAILY_HABITS.map((h) => {
+            const on = todayChecks[h.key] === true;
+            return (
+              <button key={h.key} className={`habit-row ${on ? "on" : ""}`} onClick={() => toggle(h.key)}>
+                <span className="box">{on ? "✅" : "⬜"}</span>
+                <span className="ic">{h.icon}</span>
+                <span className="label">{h.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      {doneCount === DAILY_HABITS.length && (
+        <div className="pride-intro">오늘 것 다 해냈어요! 내일 또 만나요 🎉</div>
+      )}
+      <div className="habit-note">작게 시작하는 게 비결이에요. 습관이 자리 잡으면 하나씩 늘려가요.</div>
     </>
   );
 }
