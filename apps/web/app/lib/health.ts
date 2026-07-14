@@ -116,7 +116,7 @@ export const PARTS: Part[] = [
   { n: 2,  icon: "⭐", title: "내 건강 점수",             status: "live" },
   { n: 3,  icon: "🛡️", title: "내 몸의 믿는 구석",        status: "live" },
   { n: 4,  icon: "⚠️", title: "내 몸에 보내는 경고",       status: "live" },
-  { n: 5,  icon: "📖", title: "그게 무슨 뜻이에요?",       status: "prep" },
+  { n: 5,  icon: "📖", title: "그게 무슨 뜻이에요?",       status: "live" },
   { n: 6,  icon: "🎯", title: "다음 검진까지 프로젝트",     status: "prep" },
   { n: 7,  icon: "💊", title: "내 영양제, 잘 먹고 있나요?", status: "prep" },
   { n: 8,  icon: "🌱", title: "오늘부터 하는 건강습관",     status: "prep" },
@@ -258,6 +258,59 @@ export function buildWarnings(data: Record<string, string>): Warning[] {
   }
   // 위험(bad) 먼저, 그다음 주의(warn)
   out.sort((a, b) => (a.status === b.status ? 0 : a.status === "bad" ? -1 : 1));
+  return out;
+}
+
+// ===== Part 5: 그게 무슨 뜻이에요? (결과지 용어 쉬운말 사전) =====
+const TERM_EXPLAIN: Record<string, string> = {
+  sbp: "심장이 피를 쫙 밀어낼 때 혈관이 받는 압력이에요. 물호스를 세게 틀었을 때의 세기 같은 거죠.",
+  dbp: "심장이 쉬는 순간에도 혈관에 남아 있는 압력이에요.",
+  glucose: "8시간 굶은 뒤 피 속에 남아 있는 당(설탕)의 양이에요. 아침 공복에 재는 이유예요.",
+  tchol: "피 속 기름기의 전체 합계예요. 좋은 것(HDL)과 나쁜 것(LDL)이 섞여 있어요.",
+  hdl: "혈관에 낀 기름때를 청소해 가는 청소부예요. 이건 높을수록 좋아요.",
+  ldl: "혈관 벽에 기름때를 붙이고 다니는 배달트럭이에요. 많으면 때가 쌓여요.",
+  tg: "쓰고 남은 열량이 기름 형태로 피에 떠다니는 거예요. 야식·단것·술과 친해요.",
+  ast: "간세포가 다치면 피로 흘러나오는 효소예요. 높으면 간이 힘들다는 신호예요.",
+  alt: "간에 더 특화된 효소예요. 이게 높으면 간 자체가 지쳤을 가능성이 커요.",
+  ggt: "술·약물에 민감하게 반응하는 간 효소예요. 술 드시는 분의 간 상태를 잘 보여줘요.",
+  cr: "근육을 쓰고 남은 찌꺼기예요. 콩팥이 잘 거르면 피에 조금만 남아요.",
+  egfr: "콩팥이 1분에 피를 얼마나 걸러내는지 계산한 성적표예요. 클수록 좋아요.",
+  hb: "피 속에서 산소를 실어 나르는 배달부예요. 부족하면 빈혈 — 쉽게 지치고 어지러워요.",
+  bmi: "키에 비해 몸무게가 적당한지 보는 숫자예요. 몸무게(kg)를 키(m)의 제곱으로 나눠 계산해요.",
+  waist: "뱃속 내장 사이에 낀 지방을 가늠하는 줄자예요. 내장지방은 혈관·혈당의 적이에요.",
+};
+
+export type TermEntry = {
+  key: string; name: string; explain: string;
+  section: string;
+  myValText: string | null;   // 입력했으면 "120 mg/dL"
+  myStatus: Status | null;    // 입력했으면 판정
+};
+
+export function buildTerms(data: Record<string, string>): TermEntry[] {
+  const sex = data.sex ?? "";
+  const out: TermEntry[] = [];
+  for (const sec of SECTIONS) {
+    for (const it of sec.items) {
+      const explain = TERM_EXPLAIN[it.key];
+      if (!explain) continue;
+      const raw = data[it.key];
+      const has = raw != null && raw !== "";
+      out.push({
+        key: it.key, name: it.name, explain, section: sec.title,
+        myValText: has ? `${raw} ${it.unit}`.trim() : null,
+        myStatus: has ? statusOfKey(it.key, data, sex) : null,
+      });
+    }
+  }
+  // BMI (자동 계산 항목) — '기본 정보' 묶음의 맨 앞에 끼워넣기
+  const bmi = computeBMI(data);
+  const firstBasic = out.findIndex((t) => t.section === "기본 정보");
+  out.splice(firstBasic === -1 ? 0 : firstBasic, 0, {
+    key: "bmi", name: "BMI(체질량지수)", explain: TERM_EXPLAIN.bmi, section: "기본 정보",
+    myValText: bmi != null ? String(bmi) : null,
+    myStatus: bmi != null ? bmiStatus(bmi) : null,
+  });
   return out;
 }
 

@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths, buildWarnings, buildLetter,
+  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths, buildWarnings, buildLetter, buildTerms,
 } from "./lib/health";
 import type { Item } from "./lib/health";
 
@@ -116,7 +116,8 @@ function PartView({
         {n === 1 ? <LetterPart data={data} onInput={onInput} /> :
          n === 2 ? <SummaryView data={data} onInput={onInput} /> :
          n === 3 ? <PridePart data={data} onInput={onInput} /> :
-         n === 4 ? <WarnPart data={data} onInput={onInput} /> : (
+         n === 4 ? <WarnPart data={data} onInput={onInput} /> :
+         n === 5 ? <TermsPart data={data} /> : (
           <div className="prep">
             <div className="big">{p.icon}</div>
             <div className="t">준비 중이에요</div>
@@ -307,6 +308,39 @@ function WarnPart({ data, onInput }: { data: Data; onInput: () => void }) {
         이 신호는 검진 수치를 쉽게 풀어 설명한 것이며, 의학적 진단이 아닙니다.
         정확한 진단과 상담은 의사·의료기관에서 받으세요.
       </div>
+    </>
+  );
+}
+
+// ===== Part 5: 그게 무슨 뜻이에요? (용어 사전) =====
+// 수치가 없어도 사전은 볼 수 있다. 수치가 있으면 "📌 당신의 수치"가 붙는다.
+function TermsPart({ data }: { data: Data }) {
+  const terms = buildTerms(data);
+  const sections = [...new Set(terms.map((t) => t.section))];
+  return (
+    <>
+      <div className="pride-intro">결과지에서 만나는 어려운 말들, 쉽게 풀어드릴게요.</div>
+      {sections.map((sec) => (
+        <div className="card" key={sec}>
+          <h2>{sec}</h2>
+          <div className="body">
+            {terms.filter((t) => t.section === sec).map((t) => (
+              <div className="term" key={t.key}>
+                <div className="term-name">{t.name}</div>
+                <div className="term-explain">{t.explain}</div>
+                {t.myValText !== null && (
+                  <div className="term-mine">
+                    📌 당신의 수치: <b>{t.myValText}</b>
+                    {t.myStatus !== null && t.myStatus !== "none" && (
+                      <span className={`badge ${t.myStatus}`}>{STATUS_LABEL[t.myStatus]}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </>
   );
 }
