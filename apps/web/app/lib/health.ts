@@ -115,7 +115,7 @@ export const PARTS: Part[] = [
   { n: 1,  icon: "✉️", title: "의사 선생님의 편지",       status: "prep" },
   { n: 2,  icon: "⭐", title: "내 건강 점수",             status: "live" },
   { n: 3,  icon: "🛡️", title: "내 몸의 믿는 구석",        status: "live" },
-  { n: 4,  icon: "⚠️", title: "내 몸에 보내는 경고",       status: "prep" },
+  { n: 4,  icon: "⚠️", title: "내 몸에 보내는 경고",       status: "live" },
   { n: 5,  icon: "📖", title: "그게 무슨 뜻이에요?",       status: "prep" },
   { n: 6,  icon: "🎯", title: "다음 검진까지 프로젝트",     status: "prep" },
   { n: 7,  icon: "💊", title: "내 영양제, 잘 먹고 있나요?", status: "prep" },
@@ -224,6 +224,40 @@ export function buildStrengths(data: Record<string, string>): StrengthArea[] {
     }
     if (goodItems.length) out.push({ key: area.key, name: area.name, icon: area.icon, goodItems });
   }
+  return out;
+}
+
+// ===== Part 4: 내 몸에 보내는 경고 (주의·위험만, 생활 비유 문구) =====
+const WARN_MSG: Record<string, string> = {
+  sbp: "혈관이 평소보다 힘을 더 주고 버티는 중이에요",
+  dbp: "혈관이 평소보다 힘을 더 주고 버티는 중이에요",
+  glucose: "몸이 당(설탕)을 처리하는 속도가 느려졌다는 신호예요",
+  tchol: "혈관에 기름때가 쌓이기 시작한다는 신호예요",
+  ldl: "혈관에 기름때가 쌓이기 시작한다는 신호예요",
+  tg: "핏속 기름기가 많다는 뜻이에요",
+  hdl: "혈관을 청소하는 좋은 일꾼이 부족해요",
+  ast: "간이 요즘 좀 지쳐 있다는 신호예요",
+  alt: "간이 요즘 좀 지쳐 있다는 신호예요",
+  ggt: "간이 요즘 좀 지쳐 있다는 신호예요",
+  cr: "콩팥이 힘들어하고 있다는 신호예요",
+  egfr: "콩팥이 힘들어하고 있다는 신호예요",
+  bmi: "몸에 살이 좀 붙어서 관리가 필요해요",
+  waist: "몸에 살이 좀 붙어서 관리가 필요해요",
+  hb: "피 속 산소 배달부가 부족해요",
+};
+
+export type Warning = { key: string; name: string; status: "warn" | "bad"; msg: string };
+
+export function buildWarnings(data: Record<string, string>): Warning[] {
+  const sex = data.sex ?? "";
+  const keys = ["bmi", ...SECTIONS.flatMap((s) => s.items.filter((i) => i.eval).map((i) => i.key))];
+  const out: Warning[] = [];
+  for (const k of keys) {
+    const st = statusOfKey(k, data, sex);
+    if (st === "warn" || st === "bad") out.push({ key: k, name: nameOfKey(k), status: st, msg: WARN_MSG[k] ?? "" });
+  }
+  // 위험(bad) 먼저, 그다음 주의(warn)
+  out.sort((a, b) => (a.status === b.status ? 0 : a.status === "bad" ? -1 : 1));
   return out;
 }
 

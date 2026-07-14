@@ -108,6 +108,19 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .badge.bad  { background: #f8e0de; color: #b23a31; }
 .badge.none { background: #eef1f2; color: #aaa; }
 
+/* Part 4: 내 몸에 보내는 경고 */
+.warn-intro {
+  background: #fbf0d8; border: 1px solid #f0dca8; color: #8a6212;
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; font-size: 15px; line-height: 1.6;
+}
+.warn-row { display: flex; align-items: flex-start; gap: 12px; padding: 4px 0; }
+.warn-row .sig { font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+.warn-row .sig.warn { background: #fbf0d8; color: #a9761a; }
+.warn-row .sig.bad { background: #f8e0de; color: #b23a31; }
+.warn-text { flex: 1; }
+.warn-text .warn-name { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+.warn-text .warn-msg { font-size: 14px; color: #5a6b64; line-height: 1.5; }
+
 /* Part 3: 내 몸의 믿는 구석 */
 .pride-intro {
   background: #e1f5ee; border: 1px solid #bfe6d8; color: #0f6e56;

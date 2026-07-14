@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths,
+  SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths, buildWarnings,
 } from "./lib/health";
 import type { Item } from "./lib/health";
 
@@ -114,7 +114,8 @@ function PartView({
       <div>
         <div className="part-title">{p.icon} {p.title}</div>
         {n === 2 ? <SummaryView data={data} onInput={onInput} /> :
-         n === 3 ? <PridePart data={data} onInput={onInput} /> : (
+         n === 3 ? <PridePart data={data} onInput={onInput} /> :
+         n === 4 ? <WarnPart data={data} onInput={onInput} /> : (
           <div className="prep">
             <div className="big">{p.icon}</div>
             <div className="t">준비 중이에요</div>
@@ -237,6 +238,43 @@ function PridePart({ data, onInput }: { data: Data; onInput: () => void }) {
           </div>
         </div>
       ))}
+    </>
+  );
+}
+
+// ===== Part 4: 내 몸에 보내는 경고 =====
+function WarnPart({ data, onInput }: { data: Data; onInput: () => void }) {
+  const hasData = buildSummary(data).hasData;
+  const warnings = buildWarnings(data);
+  if (!hasData) {
+    return (
+      <div className="empty">
+        아직 입력한 수치가 없어요.<br /><br />
+        <button className="btn-primary empty-btn" onClick={onInput}>검진 수치 입력하러 가기</button>
+      </div>
+    );
+  }
+  if (!warnings.length) {
+    return <div className="pride-intro">경고할 게 없어요! 아주 잘 지내고 계세요 🎉</div>;
+  }
+  return (
+    <>
+      <div className="warn-intro">지금 신경 써야 할 신호예요. 하나씩 볼게요.</div>
+      {warnings.map((w) => (
+        <div className="card" key={w.key}>
+          <div className="warn-row">
+            <span className={`sig ${w.status}`}>{w.status === "bad" ? "🔴 위험" : "🟡 주의"}</span>
+            <div className="warn-text">
+              <div className="warn-name">{w.name}</div>
+              <div className="warn-msg">{w.msg}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="disclaimer">
+        이 신호는 검진 수치를 쉽게 풀어 설명한 것이며, 의학적 진단이 아닙니다.
+        정확한 진단과 상담은 의사·의료기관에서 받으세요.
+      </div>
     </>
   );
 }
