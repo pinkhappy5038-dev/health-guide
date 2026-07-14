@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import {
   SECTIONS, PROFILE_FIELDS, HABIT_FIELDS, PARTS, STATUS_LABEL, STORE_KEY, partByNum, buildSummary, buildScores, buildStrengths, buildWarnings, buildLetter, buildTerms, buildJourneyLine, PHILOSOPHY,
   DAILY_HABITS, HABITS_STORE_KEY, todayKey, computeStreak, buildProject, buildRisks,
+  SUPP_DICT, SUPPS_STORE_KEY, diagnoseSupps,
 } from "./lib/health";
 import type { HabitRecords } from "./lib/health";
 import type { Item } from "./lib/health";
@@ -129,6 +130,7 @@ function PartView({
          n === 4 ? <WarnPart data={data} onInput={onInput} /> :
          n === 5 ? <TermsPart data={data} /> :
          n === 6 ? <ProjectPart data={data} onInput={onInput} /> :
+         n === 7 ? <SuppsPart data={data} /> :
          n === 8 ? <HabitsPart /> :
          n === 9 ? <RisksPart data={data} onInput={onInput} /> :
          n === 10 ? <ClosingPart data={data} onPromise={onPromise} /> : (
@@ -411,6 +413,96 @@ function ProjectPart({ data, onInput }: { data: Data; onInput: () => void }) {
       <div className="disclaimer">
         목표·미션은 검진 수치를 바탕으로 한 생활 제안이며, 의학적 처방이 아닙니다.
         약 복용·치료 중이라면 의사와 상의 후 실천하세요.
+      </div>
+    </>
+  );
+}
+
+// ===== Part 7: 내 영양제, 잘 먹고 있나요? =====
+function SuppsPart({ data }: { data: Data }) {
+  const [myKeys, setMyKeys] = useState<string[]>([]);
+  // 처음 한 번: 저장해둔 내 영양제 목록 불러오기
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(SUPPS_STORE_KEY);
+      if (raw) setMyKeys(JSON.parse(raw));
+    } catch { /* 깨졌으면 빈 목록 */ }
+  }, []);
+
+  function toggle(key: string) {
+    setMyKeys((prev) => {
+      const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
+      localStorage.setItem(SUPPS_STORE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  const diag = diagnoseSupps(myKeys, data);
+  const mine = SUPP_DICT.filter((s) => myKeys.includes(s.key));
+
+  return (
+    <>
+      <div className="pride-intro">지금 드시는 영양제를 골라주세요. 겹치는 것·빠진 것·먹는 시간을 정리해드릴게요.</div>
+
+      <div className="card">
+        <h2>💊 내가 먹는 영양제 (누르면 선택)</h2>
+        <div className="body supp-pick">
+          {SUPP_DICT.map((s) => (
+            <button key={s.key} className={`supp-chip ${myKeys.includes(s.key) ? "on" : ""}`} onClick={() => toggle(s.key)}>
+              {myKeys.includes(s.key) ? "✅ " : ""}{s.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {mine.length > 0 && (
+        <>
+          <div className="card">
+            <h2>🔍 진단</h2>
+            <div className="body">
+              {diag.overlaps.map((o, i) => (
+                <div className="supp-diag warn" key={i}>🔁 <b>{o.purpose}</b> 목적이 겹쳐요: {o.names.join(", ")} — 하나로 줄여도 될지 약사와 상담해보세요</div>
+              ))}
+              {diag.tooMany && (
+                <div className="supp-diag warn">⚠️ 가짓수가 {mine.length}개예요 — 많을수록 몸이 흡수·처리하기 힘들어요. "왜 먹는지" 답 못 하는 것부터 정리 1순위!</div>
+              )}
+              {diag.missing.map((m, i) => (
+                <div className="supp-diag info" key={i}>💡 {m}</div>
+              ))}
+              {diag.overlaps.length === 0 && !diag.tooMany && diag.missing.length === 0 && (
+                <div className="supp-diag good">✅ 겹치는 것 없이 알맞게 드시고 있어요</div>
+              )}
+            </div>
+          </div>
+
+          <div className="card">
+            <h2>⏰ 하루 복용 시간표 (약봉투처럼)</h2>
+            <div className="body">
+              {diag.schedule.map((g) => (
+                <div className="supp-slot" key={g.slot}>
+                  <div className="slot-name">{g.icon} {g.slot}</div>
+                  {g.items.map((it, i) => (
+                    <div className="slot-item" key={i}>{it.name}{it.tip !== undefined && <span className="tip"> — {it.tip}</span>}</div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="card">
+            <h2>🗒️ 이건 왜 먹어요?</h2>
+            <div className="body">
+              {mine.map((s) => (
+                <div className="supp-why" key={s.key}><b>{s.name}</b> — {s.why}</div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className="disclaimer">
+        이 정리는 일반 정보이며 복약 지도가 아닙니다. 병원 약을 드시는 분은
+        영양제와 부딪힐 수 있으니 반드시 약사·의사와 상담하세요.
       </div>
     </>
   );

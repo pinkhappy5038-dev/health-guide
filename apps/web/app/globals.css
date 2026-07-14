@@ -108,6 +108,26 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .badge.bad  { background: #f8e0de; color: #b23a31; }
 .badge.none { background: #eef1f2; color: #aaa; }
 
+/* Part 7: 영양제 */
+.supp-pick { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 12px; padding-bottom: 12px; }
+.supp-chip {
+  padding: 10px 14px; border-radius: 20px; border: 1px solid #cdd3d7;
+  background: #fff; font-size: 14px; cursor: pointer;
+}
+.supp-chip.on { background: #e1f5ee; border-color: #2f6f5e; color: #0f6e56; font-weight: 700; }
+.supp-diag { padding: 11px 0; border-bottom: 1px solid #f0f2f3; font-size: 14px; line-height: 1.6; }
+.supp-diag:last-child { border-bottom: 0; }
+.supp-diag.warn { color: #a9761a; }
+.supp-diag.info { color: #185fa5; }
+.supp-diag.good { color: #2c8156; }
+.supp-slot { padding: 10px 0; border-bottom: 1px solid #f0f2f3; }
+.supp-slot:last-child { border-bottom: 0; }
+.slot-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.slot-item { font-size: 14px; padding: 3px 0 3px 8px; }
+.slot-item .tip { color: #9aa4a9; font-size: 13px; }
+.supp-why { padding: 9px 0; border-bottom: 1px solid #f0f2f3; font-size: 14px; line-height: 1.6; }
+.supp-why:last-child { border-bottom: 0; }
+
 /* Part 9: 갈림길 (1·5·10년) */
 .risk-row { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f2f3; align-items: baseline; }
 .risk-row .yr { width: 56px; flex-shrink: 0; font-size: 13px; font-weight: 700; color: #a9761a; }

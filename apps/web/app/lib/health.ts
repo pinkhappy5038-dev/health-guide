@@ -118,7 +118,7 @@ export const PARTS: Part[] = [
   { n: 4,  icon: "⚠️", title: "내 몸에 보내는 경고",       status: "live" },
   { n: 5,  icon: "📖", title: "그게 무슨 뜻이에요?",       status: "live" },
   { n: 6,  icon: "🎯", title: "다음 검진까지 프로젝트",     status: "live" },
-  { n: 7,  icon: "💊", title: "내 영양제, 잘 먹고 있나요?", status: "prep" },
+  { n: 7,  icon: "💊", title: "내 영양제, 잘 먹고 있나요?", status: "live" },
   { n: 8,  icon: "🌱", title: "오늘부터 하는 건강습관",     status: "live" },
   { n: 9,  icon: "🔮", title: "앞으로 생길 가능성 높은 질환", status: "live" },
   { n: 10, icon: "🤝", title: "의사의 마지막 이야기",       status: "live" },
@@ -388,6 +388,66 @@ export function buildLetter(data: Record<string, string>): Letter {
   paras.push(close);
   paras.push("— 당신의 건강을 지켜보는 가이드북 드림");
   return { paragraphs: paras };
+}
+
+// ===== Part 7: 내 영양제, 잘 먹고 있나요? =====
+export const SUPPS_STORE_KEY = "health-guide-supps";
+
+// 흔한 영양제 사전: 목적(purpose)이 같으면 "겹침"으로 진단. when = 먹기 좋은 때.
+export type SuppInfo = { key: string; name: string; purpose: string; why: string; when: "아침 공복" | "식후" | "저녁" ; tip?: string };
+export const SUPP_DICT: SuppInfo[] = [
+  { key: "probiotic", name: "유산균", purpose: "장 건강", why: "장 속 좋은 균을 늘려 배변·면역을 도와요", when: "아침 공복", tip: "따뜻한 물과 함께" },
+  { key: "omega3", name: "오메가3", purpose: "혈행·혈관", why: "핏속 기름기(중성지방) 관리와 혈행을 도와요", when: "식후", tip: "기름진 식사와 흡수↑" },
+  { key: "lutein", name: "루테인", purpose: "눈 건강", why: "나이 들며 줄어드는 눈의 황반 색소를 보충해요", when: "식후" },
+  { key: "eyeomega", name: "눈 영양제(오메가 함유)", purpose: "눈 건강", why: "눈 피로·건조감 관리를 도와요", when: "식후" },
+  { key: "vitd", name: "비타민D", purpose: "뼈·면역", why: "칼슘 흡수와 면역에 필요해요. 실내 생활이 많으면 부족하기 쉬워요", when: "식후", tip: "지용성 — 식후에" },
+  { key: "calcium", name: "칼슘", purpose: "뼈·면역", why: "뼈를 지키는 기본 재료예요", when: "식후" },
+  { key: "magnesium", name: "마그네슘", purpose: "근육·수면", why: "눈 떨림·근육 뭉침·수면의 질에 관여해요", when: "저녁" },
+  { key: "vitb", name: "비타민B군", purpose: "피로 회복", why: "에너지 대사를 도와 피로 관리에 쓰여요", when: "식후", tip: "아침·점심 식후 (저녁엔 수면 방해 가능)" },
+  { key: "vitc", name: "비타민C", purpose: "항산화·면역", why: "면역과 피부, 철분 흡수를 도와요", when: "식후" },
+  { key: "iron", name: "철분", purpose: "빈혈", why: "혈색소(피 속 산소 배달부)의 재료예요", when: "아침 공복", tip: "비타민C와 함께, 커피·우유와는 띄워서" },
+  { key: "ginkgo", name: "은행잎 추출물", purpose: "기억력·혈행", why: "말초 혈행과 기억력 관리에 쓰여요", when: "식후" },
+  { key: "memory", name: "기억력 영양제(포스파티딜세린 등)", purpose: "기억력·혈행", why: "인지 건강 관리에 쓰여요", when: "식후" },
+  { key: "redginseng", name: "홍삼", purpose: "피로 회복", why: "활력·면역 관리에 널리 쓰여요", when: "식후" },
+  { key: "milkthistle", name: "밀크씨슬", purpose: "간 건강", why: "간 건강 관리에 쓰이는 성분(실리마린)이에요", when: "식후" },
+];
+
+export type SuppDiagnosis = {
+  overlaps: { purpose: string; names: string[] }[];  // 겹친다
+  tooMany: boolean;                                   // 넘친다 (6개 이상)
+  missing: string[];                                  // 빠졌다 (검진 근거)
+  schedule: { slot: string; icon: string; items: { name: string; tip?: string }[] }[]; // 시간표
+};
+
+export function diagnoseSupps(myKeys: string[], data: Record<string, string>): SuppDiagnosis {
+  const mine = SUPP_DICT.filter((s) => myKeys.includes(s.key));
+  // 겹친다: 같은 purpose 2개 이상
+  const byPurpose: Record<string, string[]> = {};
+  for (const s of mine) (byPurpose[s.purpose] ??= []).push(s.name);
+  const overlaps = Object.entries(byPurpose)
+    .filter(([, names]) => names.length >= 2)
+    .map(([purpose, names]) => ({ purpose, names }));
+  // 넘친다: 6개 이상
+  const tooMany = mine.length >= 6;
+  // 빠졌다: 검진 근거 있는 것만 (지어내지 않기)
+  const sex = data.sex ?? "";
+  const missing: string[] = [];
+  const st = (k: string) => statusOfKey(k, data, sex);
+  if ((st("hb") === "warn" || st("hb") === "bad") && !myKeys.includes("iron"))
+    missing.push("혈색소가 낮게 나왔는데 철분제가 없어요 — 의사와 상담해보세요");
+  if ((st("tg") === "warn" || st("tg") === "bad") && !myKeys.includes("omega3"))
+    missing.push("중성지방이 높게 나왔어요 — 오메가3가 도움될 수 있어요 (의사·약사와 상담)");
+  // 시간표
+  const slots: { slot: "아침 공복" | "식후" | "저녁"; icon: string }[] = [
+    { slot: "아침 공복", icon: "☀️" }, { slot: "식후", icon: "🍚" }, { slot: "저녁", icon: "🌙" },
+  ];
+  const schedule = slots
+    .map(({ slot, icon }) => ({
+      slot, icon,
+      items: mine.filter((s) => s.when === slot).map((s) => ({ name: s.name, tip: s.tip })),
+    }))
+    .filter((g) => g.items.length > 0);
+  return { overlaps, tooMany, missing, schedule };
 }
 
 // ===== Part 9: 앞으로 생길 가능성 높은 질환 (갈림길, 규칙 기반 — AI 업그레이드는 나중) =====
