@@ -34,3 +34,9 @@
 - 왜: .env의 ANTHROPIC_API_KEY가 dummy(가짜) — 실제 호출엔 유료 키 필요. 돈·가입이 걸린 결정이라 사용자 선택으로.
 - 버린 대안: 지금 바로 키 발급받고 AI 연결.
 - 영향: buildRisks(규칙 기반) 추가로 Part 9 완성. AI 붙일 때 글 생성만 교체하면 되는 구조.
+
+## 2026-07-16 · 깃허브 백업 + 버셀 배포 완료
+- 결정: GitHub Desktop으로 푸시 경로 개통, 버셀에 apps/web 배포 (Root Directory=apps/web, 환경변수 없음).
+- 왜: 2주치 작업물이 노트북에만 있던 위험 해소 + 가족 폰에서 접속할 인터넷 주소 확보.
+- 버린 대안: 명령줄 인증(gh/토큰) — 초보자에게 GitHub Desktop이 가장 쉬움.
+- 영향: 공식 주소 https://health-guide-web.vercel.app 탄생. 앞으로 "클로드 커밋 → 사용자 Push origin 클릭 → 버셀 자동 재배포" 흐름.
