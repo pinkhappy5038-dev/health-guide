@@ -1,14 +1,15 @@
-/* 평생건강가이드북 디자인 — prototype/index.html 의 <style> 를 그대로 옮김 */
+/* 평생건강가이드북 디자인 */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 * { box-sizing: border-box; }
 body {
-  font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  margin: 0; background: #f4f6f8; color: #222; line-height: 1.6;
+  font-family: "Pretendard", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  margin: 0; background: #f4f6f8; color: #1c1c1c; line-height: 1.6;
 }
 header {
   background: #2f6f5e; color: #fff; padding: 18px 20px;
 }
 header h1 { margin: 0; font-size: 22px; }
-header p { margin: 5px 0 0; font-size: 15px; opacity: .92; }
+header p { margin: 5px 0 0; font-size: 15px; opacity: 1; }
 
 main { max-width: 720px; margin: 0 auto; padding: 16px; }
 
@@ -50,10 +51,10 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
   background: #fff; border: 1px solid #e3e7ea; border-radius: 12px;
   padding: 16px 16px; margin-bottom: 10px; cursor: pointer;
 }
-.toc-item .no { width: 30px; font-size: 16px; font-weight: 700; color: #7d8890; }
+.toc-item .no { width: 30px; font-size: 16px; font-weight: 700; color: #5f6a72; }
 .toc-item .ic { font-size: 22px; }
 .toc-item .t { flex: 1; font-size: 17px; color: #222; }
-.toc-item .ready { font-size: 13px; color: #8a9298; }
+.toc-item .ready { font-size: 13px; color: #6b757d; }
 
 .toc-input-btn {
   display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
@@ -62,9 +63,9 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 }
 
 /* 준비 중 파트 */
-.prep { text-align: center; color: #7d8890; padding: 60px 20px; }
+.prep { text-align: center; color: #5f6a72; padding: 60px 20px; }
 .prep .big { font-size: 40px; margin-bottom: 10px; }
-.prep .t { font-size: 18px; color: #666; font-weight: 700; }
+.prep .t { font-size: 18px; color: #555; font-weight: 700; }
 .prep .s { font-size: 15px; margin-top: 6px; }
 .part-title { font-size: 22px; font-weight: 700; margin: 0 0 16px; color: #222; }
 
@@ -75,7 +76,7 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f2f3; gap: 10px; }
 .row:last-child { border-bottom: 0; }
 .row label { flex: 1; font-size: 16px; }
-.row .unit { font-size: 14px; color: #767f85; width: 56px; }
+.row .unit { font-size: 14px; color: #59636a; width: 56px; }
 .row input, .row select {
   width: 120px; padding: 11px; border: 1px solid #cdd3d7; border-radius: 8px; font-size: 17px; text-align: right;
 }
@@ -101,12 +102,12 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .metric:last-child { border-bottom: 0; }
 .metric .name { flex: 1; font-size: 15px; }
 .metric .val { font-weight: 700; font-size: 16px; width: 96px; text-align: right; }
-.metric .ref { font-size: 13px; color: #767f85; width: 130px; text-align: right; }
+.metric .ref { font-size: 13px; color: #59636a; width: 130px; text-align: right; }
 .badge { font-size: 13px; font-weight: 700; padding: 4px 9px; border-radius: 20px; width: 56px; text-align: center; }
 .badge.good { background: #e2f3ea; color: #2c8156; }
 .badge.warn { background: #fbf0d8; color: #a9761a; }
 .badge.bad  { background: #f8e0de; color: #b23a31; }
-.badge.none { background: #eef1f2; color: #aaa; }
+.badge.none { background: #eef1f2; color: #78828a; }
 
 /* Part 7: 영양제 */
 .supp-pick { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 12px; padding-bottom: 12px; }
@@ -124,14 +125,14 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .supp-slot:last-child { border-bottom: 0; }
 .slot-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .slot-item { font-size: 15px; padding: 3px 0 3px 8px; }
-.slot-item .tip { color: #7d8890; font-size: 14px; }
+.slot-item .tip { color: #5f6a72; font-size: 14px; }
 .supp-why { padding: 10px 0; border-bottom: 1px solid #f0f2f3; font-size: 15px; line-height: 1.6; }
 .supp-why:last-child { border-bottom: 0; }
 
 /* Part 9: 갈림길 (1·5·10년) */
 .risk-row { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f2f3; align-items: baseline; }
 .risk-row .yr { width: 60px; flex-shrink: 0; font-size: 14px; font-weight: 700; color: #a9761a; }
-.risk-row .tx { font-size: 15px; color: #4a5550; line-height: 1.6; }
+.risk-row .tx { font-size: 15px; color: #3c4844; line-height: 1.6; }
 .risk-change {
   margin-top: 12px; background: #e1f5ee; border-radius: 8px;
   padding: 12px 14px; font-size: 15px; color: #0f6e56; line-height: 1.6;
@@ -147,11 +148,11 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .goal-row:last-child { border-bottom: 0; }
 .goal-row .sig { font-size: 14px; }
 .goal-name { font-size: 15px; font-weight: 700; flex: 1; }
-.goal-move { font-size: 15px; color: #5a6b64; }
+.goal-move { font-size: 15px; color: #46554e; }
 .goal-move b { color: #2f6f5e; }
 .mission-row { padding: 12px 0; border-bottom: 1px solid #f0f2f3; font-size: 16px; }
 .mission-row:last-of-type { border-bottom: 0; }
-.mission-note { margin-top: 10px; font-size: 14px; color: #7d8890; }
+.mission-note { margin-top: 10px; font-size: 14px; color: #5f6a72; }
 
 /* Part 8: 오늘의 체크리스트 */
 .habit-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -172,7 +173,7 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .habit-row .ic { font-size: 20px; }
 .habit-row .label { flex: 1; }
 .habit-row.on .label { color: #2f6f5e; text-decoration: line-through; text-decoration-color: #9fc9ba; }
-.habit-note { text-align: center; font-size: 14px; color: #7d8890; margin-top: 12px; }
+.habit-note { text-align: center; font-size: 14px; color: #5f6a72; margin-top: 12px; }
 
 /* Part 10: 마지막 이야기 & 약속 */
 .philosophy {
@@ -194,14 +195,14 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .promise-saved {
   margin: 8px 0 6px; font-size: 18px; text-align: center; color: #2f6f5e; font-weight: 700; line-height: 1.6;
 }
-.promise-note { margin: 0 0 12px; font-size: 14px; color: #7d8890; text-align: center; }
+.promise-note { margin: 0 0 12px; font-size: 14px; color: #5f6a72; text-align: center; }
 .see-you { text-align: center; font-size: 17px; font-weight: 700; color: #2f6f5e; padding: 18px 0 6px; }
 
 /* Part 5: 용어 사전 */
 .term { padding: 13px 0; border-bottom: 1px solid #f0f2f3; }
 .term:last-child { border-bottom: 0; }
 .term-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-.term-explain { font-size: 15px; color: #5a6b64; line-height: 1.6; }
+.term-explain { font-size: 15px; color: #46554e; line-height: 1.6; }
 .term-mine { margin-top: 8px; font-size: 14px; color: #2f6f5e; background: #f2f8f5; border-radius: 8px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
 .term-mine b { font-size: 15px; }
 
@@ -227,8 +228,8 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 }
 .letter p { margin: 0 0 34px; }
 .letter p:last-child { margin-bottom: 0; }
-.letter .date { text-align: right; color: #9a8f74; font-size: 14px; margin-bottom: 0; }
-.letter .sign { text-align: right; color: #8a8272; font-size: 15px; }
+.letter .date { text-align: right; color: #7d7358; font-size: 14px; margin-bottom: 0; }
+.letter .sign { text-align: right; color: #6f6852; font-size: 15px; }
 
 /* Part 4: 내 몸에 보내는 경고 */
 .warn-intro {
@@ -241,7 +242,7 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .warn-row .sig.bad { background: #f8e0de; color: #b23a31; }
 .warn-text { flex: 1; }
 .warn-text .warn-name { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
-.warn-text .warn-msg { font-size: 15px; color: #5a6b64; line-height: 1.6; }
+.warn-text .warn-msg { font-size: 15px; color: #46554e; line-height: 1.6; }
 
 /* Part 3: 내 몸의 믿는 구석 */
 .pride-intro {
@@ -263,7 +264,7 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .score-row .stars { font-size: 18px; letter-spacing: 1px; width: 96px; text-align: right; }
 .score-row .stars .on { color: #f0b429; }
 .score-row .stars .off { color: #dbe0e3; }
-.score-row .none { font-size: 14px; color: #8a9298; width: 154px; text-align: right; }
+.score-row .none { font-size: 14px; color: #6b757d; width: 154px; text-align: right; }
 
 /* 안내 문구 */
 .input-hint {
@@ -271,16 +272,16 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
   border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; font-size: 15px; line-height: 1.6;
 }
 .missing-note {
-  background: #f7f9fa; border: 1px dashed #cdd8d3; color: #5a6b64;
+  background: #f7f9fa; border: 1px dashed #cdd8d3; color: #46554e;
   border-radius: 10px; padding: 14px; margin-top: 14px; font-size: 15px; line-height: 1.6; text-align: center;
 }
 .missing-btn { display: block; width: 100%; margin-top: 10px; padding: 14px; border: 0; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
 
 .disclaimer {
   margin-top: 16px; padding: 12px 14px; border-top: 1px solid #eceff1;
-  font-size: 13px; line-height: 1.7; color: #7d8890; text-align: center;
+  font-size: 13px; line-height: 1.7; color: #5f6a72; text-align: center;
 }
 
-.empty { text-align: center; color: #767f85; padding: 40px 0; }
+.empty { text-align: center; color: #59636a; padding: 40px 0; }
 .empty-btn { padding: 12px 20px; border: 0; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
-.updated { text-align: center; font-size: 13px; color: #8a9298; margin-top: 8px; }
+.updated { text-align: center; font-size: 13px; color: #6b757d; margin-top: 8px; }
