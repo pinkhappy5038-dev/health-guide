@@ -116,6 +116,8 @@ function PartView({
   onPromise: (text: string) => void;
 }) {
   const p = partByNum(n);
+  // 이름이 있으면 Part 2 제목을 "숙경님의 건강 점수"처럼 개인화
+  const title = n === 2 && data.name != null && data.name !== "" ? `${data.name}님의 건강 점수` : p.title;
   return (
     <section>
       <div className="partbar">
@@ -123,7 +125,7 @@ function PartView({
         <span className="counter">Part {n} / 10</span>
       </div>
       <div>
-        <div className="part-title">{p.icon} {p.title}</div>
+        <div className="part-title">{p.icon} {title}</div>
         {n === 1 ? <LetterPart data={data} onInput={onInput} /> :
          n === 2 ? <SummaryView data={data} onInput={onInput} /> :
          n === 3 ? <PridePart data={data} onInput={onInput} /> :
@@ -164,7 +166,7 @@ function SummaryView({ data, onInput }: { data: Data; onInput: () => void }) {
   return (
     <>
       <div className="card">
-        <h2>내 건강 점수</h2>
+        <h2>{data.name != null && data.name !== "" ? `${data.name}님의 건강 점수` : "내 건강 점수"}</h2>
         <div className="body">
           {scores.map((a) => (
             <div className="score-row" key={a.key}>
