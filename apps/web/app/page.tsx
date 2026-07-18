@@ -471,7 +471,15 @@ function SuppsPart({ data }: { data: Data }) {
               {diag.missing.map((m, i) => (
                 <div className="supp-diag info" key={i}>💡 {m}</div>
               ))}
-              {diag.overlaps.length === 0 && !diag.tooMany && diag.missing.length === 0 && (
+              {diag.matches.map((m, i) => (
+                <div className={`supp-diag ${m.kind === "fit" ? "good" : "think"}`} key={`m${i}`}>
+                  {m.kind === "fit" ? "✅" : "🤔"} <b>{m.name}</b> — {m.msg}
+                </div>
+              ))}
+              {diag.needDataHint && (
+                <div className="supp-diag info">📋 검진 수치(혈색소·중성지방·간수치)를 넣으면 이 영양제가 내 몸에 필요한지 맞춤 피드백을 드려요</div>
+              )}
+              {diag.overlaps.length === 0 && !diag.tooMany && diag.missing.length === 0 && diag.matches.length === 0 && (
                 <div className="supp-diag good">✅ 겹치는 것 없이 알맞게 드시고 있어요</div>
               )}
             </div>
@@ -483,6 +491,7 @@ function SuppsPart({ data }: { data: Data }) {
               {diag.schedule.map((g) => (
                 <div className="supp-slot" key={g.slot}>
                   <div className="slot-name">{g.icon} {g.slot}</div>
+                  <div className="slot-desc">{g.desc}</div>
                   {g.items.map((it, i) => (
                     <div className="slot-item" key={i}>{it.name}{it.tip !== undefined && <span className="tip"> — {it.tip}</span>}</div>
                   ))}

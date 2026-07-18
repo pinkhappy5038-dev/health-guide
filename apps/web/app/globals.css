@@ -124,6 +124,8 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .supp-diag.warn { color: #a9761a; }
 .supp-diag.info { color: #185fa5; }
 .supp-diag.good { color: #2c8156; }
+.supp-diag.think { color: #6b5b95; }
+.slot-desc { font-size: 15px; color: #5f6a72; margin: -2px 0 8px; }
 .supp-slot { padding: 10px 0; border-bottom: 1px solid #f0f2f3; }
 .supp-slot:last-child { border-bottom: 0; }
 .slot-name { font-size: 19px; font-weight: 700; margin-bottom: 6px; }

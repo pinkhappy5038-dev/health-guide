@@ -396,30 +396,34 @@ export function buildLetter(data: Record<string, string>): Letter {
 // ===== Part 7: 내 영양제, 잘 먹고 있나요? =====
 export const SUPPS_STORE_KEY = "health-guide-supps";
 
-// 흔한 영양제 사전: 목적(purpose)이 같으면 "겹침"으로 진단. when = 먹기 좋은 때.
-export type SuppInfo = { key: string; name: string; purpose: string; why: string; when: "아침 공복" | "식후" | "저녁" ; tip?: string };
+// 흔한 영양제 사전: 목적(purpose)이 같으면 "겹침"으로 진단. when = 먹기 좋은 때 (4칸).
+export type SuppWhen = "아침 공복" | "아침 식후" | "점심 식후" | "저녁 식후";
+export type SuppInfo = { key: string; name: string; purpose: string; why: string; when: SuppWhen; tip?: string };
 export const SUPP_DICT: SuppInfo[] = [
   { key: "probiotic", name: "유산균", purpose: "장 건강", why: "장 속 좋은 균을 늘려 배변·면역을 도와요", when: "아침 공복", tip: "따뜻한 물과 함께" },
-  { key: "omega3", name: "오메가3", purpose: "혈행·혈관", why: "핏속 기름기(중성지방) 관리와 혈행을 도와요", when: "식후", tip: "기름진 식사와 흡수↑" },
-  { key: "lutein", name: "루테인", purpose: "눈 건강", why: "나이 들며 줄어드는 눈의 황반 색소를 보충해요", when: "식후" },
-  { key: "eyeomega", name: "눈 영양제(오메가 함유)", purpose: "눈 건강", why: "눈 피로·건조감 관리를 도와요", when: "식후" },
-  { key: "vitd", name: "비타민D", purpose: "뼈·면역", why: "칼슘 흡수와 면역에 필요해요. 실내 생활이 많으면 부족하기 쉬워요", when: "식후", tip: "지용성 — 식후에" },
-  { key: "calcium", name: "칼슘", purpose: "뼈·면역", why: "뼈를 지키는 기본 재료예요", when: "식후" },
-  { key: "magnesium", name: "마그네슘", purpose: "근육·수면", why: "눈 떨림·근육 뭉침·수면의 질에 관여해요", when: "저녁" },
-  { key: "vitb", name: "비타민B군", purpose: "피로 회복", why: "에너지 대사를 도와 피로 관리에 쓰여요", when: "식후", tip: "아침·점심 식후 (저녁엔 수면 방해 가능)" },
-  { key: "vitc", name: "비타민C", purpose: "항산화·면역", why: "면역과 피부, 철분 흡수를 도와요", when: "식후" },
-  { key: "iron", name: "철분", purpose: "빈혈", why: "혈색소(피 속 산소 배달부)의 재료예요", when: "아침 공복", tip: "비타민C와 함께, 커피·우유와는 띄워서" },
-  { key: "ginkgo", name: "은행잎 추출물", purpose: "기억력·혈행", why: "말초 혈행과 기억력 관리에 쓰여요", when: "식후" },
-  { key: "memory", name: "기억력 영양제(포스파티딜세린 등)", purpose: "기억력·혈행", why: "인지 건강 관리에 쓰여요", when: "식후" },
-  { key: "redginseng", name: "홍삼", purpose: "피로 회복", why: "활력·면역 관리에 널리 쓰여요", when: "식후" },
-  { key: "milkthistle", name: "밀크씨슬", purpose: "간 건강", why: "간 건강 관리에 쓰이는 성분(실리마린)이에요", when: "식후" },
+  { key: "omega3", name: "오메가3", purpose: "혈행·혈관", why: "핏속 기름기(중성지방) 관리와 혈행을 도와요", when: "아침 식후", tip: "기름진 식사와 함께 흡수↑ (점심 식후도 좋아요)" },
+  { key: "lutein", name: "루테인", purpose: "눈 건강", why: "나이 들며 줄어드는 눈의 황반 색소를 보충해요", when: "아침 식후", tip: "지용성 — 식사 기름과 함께 흡수↑" },
+  { key: "eyeomega", name: "눈 영양제(오메가 함유)", purpose: "눈 건강", why: "눈 피로·건조감 관리를 도와요", when: "아침 식후" },
+  { key: "vitd", name: "비타민D", purpose: "뼈·면역", why: "칼슘 흡수와 면역에 필요해요. 실내 생활이 많으면 부족하기 쉬워요", when: "아침 식후", tip: "지용성 — 아침 식사와 함께" },
+  { key: "calcium", name: "칼슘", purpose: "뼈·면역", why: "뼈를 지키는 기본 재료예요", when: "저녁 식후", tip: "밤사이 뼈가 재료를 써요. 철분과는 2시간 이상 띄우기" },
+  { key: "magnesium", name: "마그네슘", purpose: "근육·수면", why: "눈 떨림·근육 뭉침·수면의 질에 관여해요", when: "저녁 식후", tip: "잠들기 1~2시간 전이면 수면에도 도움" },
+  { key: "vitb", name: "비타민B군", purpose: "피로 회복", why: "에너지 대사를 도와 피로 관리에 쓰여요", when: "아침 식후", tip: "저녁에 먹으면 잠을 방해할 수 있어요" },
+  { key: "vitc", name: "비타민C", purpose: "항산화·면역", why: "면역과 피부, 철분 흡수를 도와요", when: "점심 식후" },
+  { key: "iron", name: "철분", purpose: "빈혈", why: "혈색소(피 속 산소 배달부)의 재료예요", when: "아침 공복", tip: "비타민C와 함께면 흡수↑, 커피·우유·칼슘과는 2시간 띄우기" },
+  { key: "ginkgo", name: "은행잎 추출물", purpose: "기억력·혈행", why: "말초 혈행과 기억력 관리에 쓰여요", when: "점심 식후" },
+  { key: "memory", name: "기억력 영양제(포스파티딜세린 등)", purpose: "기억력·혈행", why: "인지 건강 관리에 쓰여요", when: "점심 식후" },
+  { key: "redginseng", name: "홍삼", purpose: "피로 회복", why: "활력·면역 관리에 널리 쓰여요", when: "아침 식후", tip: "오전 활력에 좋아요" },
+  { key: "milkthistle", name: "밀크씨슬", purpose: "간 건강", why: "간 건강 관리에 쓰이는 성분(실리마린)이에요", when: "저녁 식후", tip: "간이 회복 일을 하는 밤을 준비해요" },
 ];
 
+export type SuppMatch = { kind: "fit" | "unneeded"; name: string; msg: string };
 export type SuppDiagnosis = {
   overlaps: { purpose: string; names: string[] }[];  // 겹친다
   tooMany: boolean;                                   // 넘친다 (6개 이상)
   missing: string[];                                  // 빠졌다 (검진 근거)
-  schedule: { slot: string; icon: string; items: { name: string; tip?: string }[] }[]; // 시간표
+  matches: SuppMatch[];                               // 검진 결과 맞춤 피드백 (잘 맞아요 / 굳이?)
+  needDataHint: boolean;                              // 피드백 가능한 영양제를 골랐는데 수치가 없음
+  schedule: { slot: SuppWhen; icon: string; desc: string; items: { name: string; tip?: string }[] }[];
 };
 
 export function diagnoseSupps(myKeys: string[], data: Record<string, string>): SuppDiagnosis {
@@ -432,25 +436,50 @@ export function diagnoseSupps(myKeys: string[], data: Record<string, string>): S
     .map(([purpose, names]) => ({ purpose, names }));
   // 넘친다: 6개 이상
   const tooMany = mine.length >= 6;
-  // 빠졌다: 검진 근거 있는 것만 (지어내지 않기)
   const sex = data.sex ?? "";
-  const missing: string[] = [];
   const st = (k: string) => statusOfKey(k, data, sex);
-  if ((st("hb") === "warn" || st("hb") === "bad") && !myKeys.includes("iron"))
+  const isHigh = (s: Status | null) => s === "warn" || s === "bad";
+  // 빠졌다: 검진 근거 있는 것만 (지어내지 않기)
+  const missing: string[] = [];
+  if (isHigh(st("hb")) && !myKeys.includes("iron"))
     missing.push("혈색소가 낮게 나왔는데 철분제가 없어요 — 의사와 상담해보세요");
-  if ((st("tg") === "warn" || st("tg") === "bad") && !myKeys.includes("omega3"))
+  if (isHigh(st("tg")) && !myKeys.includes("omega3"))
     missing.push("중성지방이 높게 나왔어요 — 오메가3가 도움될 수 있어요 (의사·약사와 상담)");
-  // 시간표
-  const slots: { slot: "아침 공복" | "식후" | "저녁"; icon: string }[] = [
-    { slot: "아침 공복", icon: "☀️" }, { slot: "식후", icon: "🍚" }, { slot: "저녁", icon: "🌙" },
+
+  // 검진 결과 맞춤 피드백 — 검진 항목으로 판단 근거가 있는 영양제만 (철분·오메가3·밀크씨슬)
+  const matches: SuppMatch[] = [];
+  const liverSts = ["ast", "alt", "ggt"].map(st).filter((x) => x !== null);
+  const liverStatus: Status | null = liverSts.length === 0 ? null : (liverSts.some(isHigh) ? "warn" : "good");
+  if (myKeys.includes("iron") && st("hb") !== null) {
+    if (isHigh(st("hb"))) matches.push({ kind: "fit", name: "철분", msg: "혈색소가 낮게 나온 당신에게 잘 맞는 선택이에요 — 꾸준히 챙기세요" });
+    else matches.push({ kind: "unneeded", name: "철분", msg: "혈색소가 정상이에요 — 지금은 굳이 보충하지 않아도 돼요 (철분 과다는 오히려 몸에 부담. 의사와 상담)" });
+  }
+  if (myKeys.includes("omega3") && st("tg") !== null) {
+    if (isHigh(st("tg"))) matches.push({ kind: "fit", name: "오메가3", msg: "중성지방이 높은 당신에게 핏속 기름기 관리를 도와줘요 — 검진 결과와 딱 맞아요" });
+    else matches.push({ kind: "unneeded", name: "오메가3", msg: "중성지방이 정상이라 필수는 아니에요 — 혈행 관리 목적이면 계속 드셔도 괜찮아요" });
+  }
+  if (myKeys.includes("milkthistle") && liverStatus !== null) {
+    if (liverStatus === "warn") matches.push({ kind: "fit", name: "밀크씨슬", msg: "간 수치가 높은 당신의 목적과 맞아요 — 단, 수치가 높은 원인은 꼭 의사와 확인하세요" });
+    else matches.push({ kind: "unneeded", name: "밀크씨슬", msg: "간 수치가 모두 정상이에요 — 필수는 아니에요" });
+  }
+  // 피드백 가능한 영양제를 골랐는데 근거 수치가 하나도 없으면 안내
+  const feedbackSupps = ["iron", "omega3", "milkthistle"];
+  const needDataHint = myKeys.some((k) => feedbackSupps.includes(k)) && matches.length === 0;
+
+  // 시간표 (4칸 + 왜 이때 먹는지)
+  const slots: { slot: SuppWhen; icon: string; desc: string }[] = [
+    { slot: "아침 공복", icon: "☀️", desc: "위가 비어 있어 흡수가 가장 좋은 때예요" },
+    { slot: "아침 식후", icon: "🍳", desc: "기름에 녹는(지용성) 영양제는 식사와 함께 흡수돼요" },
+    { slot: "점심 식후", icon: "🍚", desc: "하루 중 잊지 않고 챙기기 좋은 때예요" },
+    { slot: "저녁 식후", icon: "🌙", desc: "몸이 회복을 준비하는 시간 — 수면·뼈·간을 돕는 것들" },
   ];
   const schedule = slots
-    .map(({ slot, icon }) => ({
-      slot, icon,
+    .map(({ slot, icon, desc }) => ({
+      slot, icon, desc,
       items: mine.filter((s) => s.when === slot).map((s) => ({ name: s.name, tip: s.tip })),
     }))
     .filter((g) => g.items.length > 0);
-  return { overlaps, tooMany, missing, schedule };
+  return { overlaps, tooMany, missing, matches, needDataHint, schedule };
 }
 
 // ===== Part 9: 앞으로 생길 가능성 높은 질환 (갈림길, 규칙 기반 — AI 업그레이드는 나중) =====
