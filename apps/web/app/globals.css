@@ -125,7 +125,7 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .supp-diag.info { color: #185fa5; }
 .supp-diag.good { color: #2c8156; }
 .supp-diag.think { color: #6b5b95; }
-.slot-desc { font-size: 15px; color: #5f6a72; margin: -2px 0 8px; }
+.slot-desc { font-size: 17px; color: #5f6a72; margin: -2px 0 8px; }
 .supp-slot { padding: 10px 0; border-bottom: 1px solid #f0f2f3; }
 .supp-slot:last-child { border-bottom: 0; }
 .slot-name { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
@@ -157,6 +157,11 @@ main { max-width: 720px; margin: 0 auto; padding: 16px; }
 .goal-move b { color: #2f6f5e; }
 .mission-row { padding: 12px 0; border-bottom: 1px solid #f0f2f3; font-size: 20px; }
 .mission-row:last-of-type { border-bottom: 0; }
+.mission-text { font-weight: 700; }
+.mission-effect {
+  margin-top: 5px; font-size: 17px; color: #2c8156; line-height: 1.6;
+  background: #f2f8f5; border-radius: 8px; padding: 8px 12px;
+}
 .mission-note { margin-top: 10px; font-size: 18px; color: #5f6a72; }
 
 /* Part 8: 오늘의 체크리스트 */

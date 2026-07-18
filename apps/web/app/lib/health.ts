@@ -545,14 +545,32 @@ export function buildRisks(data: Record<string, string>): { paths: RiskPath[]; a
 }
 
 // ===== Part 6: 다음 검진까지 프로젝트 (목표 수치 + 시즌 미션, 규칙 기반) =====
-// 문제 영역별 실천 미션 (연령 맞춤·AI 제안은 나중 단계)
-const AREA_MISSIONS: Record<string, string[]> = {
-  vascular: ["싱겁게 먹기 — 국물은 남기기", "주 3회, 30분 빠르게 걷기"],
-  glucose: ["단 음료 대신 물·차 마시기", "밥은 천천히 — 20분 이상 들여 먹기"],
-  liver: ["술 쉬는 날, 주 3일 만들기", "밤늦은 야식 줄이기"],
-  kidney: ["물 자주 마시기", "짜게 먹지 않기 (콩팥 부담 줄이기)"],
-  weight: ["저녁 9시 이후 안 먹기", "엘리베이터 대신 계단 이용"],
-  anemia: ["살코기·시금치 같은 철분 음식 챙겨 먹기"],
+// 문제 영역별 실천 미션 + 꾸준히 했을 때의 효과 (연령 맞춤·AI 제안은 나중 단계)
+export type Mission = { m: string; effect: string };
+const AREA_MISSIONS: Record<string, Mission[]> = {
+  vascular: [
+    { m: "싱겁게 먹기 — 국물은 남기기", effect: "2~4주면 혈압이 5~10 정도 내려갈 수 있어요. 몸의 붓기도 함께 빠져요" },
+    { m: "주 3회, 30분 빠르게 걷기", effect: "혈관이 탄력을 되찾고 좋은 콜레스테롤(HDL)이 올라가요. 4~8주면 혈압 변화가 느껴져요" },
+  ],
+  glucose: [
+    { m: "단 음료 대신 물·차 마시기", effect: "혈당 출렁임이 줄어 식후 졸림이 덜해져요. 한 달이면 몸무게도 1~2kg 가벼워질 수 있어요" },
+    { m: "밥은 천천히 — 20분 이상 들여 먹기", effect: "포만감 신호가 제때 와서 과식이 줄고, 식후 혈당이 완만해져요" },
+  ],
+  liver: [
+    { m: "술 쉬는 날, 주 3일 만들기", effect: "간은 쉬는 날부터 회복을 시작해요. 4~8주면 간 수치(감마-GTP)가 눈에 띄게 내려갈 수 있어요" },
+    { m: "밤늦은 야식 줄이기", effect: "간이 밤에 해독 일에 집중할 수 있어요. 아침에 몸이 한결 가벼워져요" },
+  ],
+  kidney: [
+    { m: "물 자주 마시기", effect: "콩팥이 노폐물을 씻어내기 쉬워져 부담이 줄어요" },
+    { m: "짜게 먹지 않기 (콩팥 부담 줄이기)", effect: "콩팥의 거르는 부담이 줄고, 혈압도 함께 내려가요" },
+  ],
+  weight: [
+    { m: "저녁 9시 이후 안 먹기", effect: "자는 동안 지방이 쌓이는 시간을 없애요. 한 달에 1~2kg, 뱃살부터 달라져요" },
+    { m: "엘리베이터 대신 계단 이용", effect: "허벅지 근육이 붙어 기초대사량이 올라가요 — 가만히 있어도 열량을 더 태우는 몸이 돼요" },
+  ],
+  anemia: [
+    { m: "살코기·시금치 같은 철분 음식 챙겨 먹기", effect: "산소 배달부(혈색소)가 늘어 어지러움과 피로가 줄어요" },
+  ],
 };
 // 항목 → 영역 찾기 (미션 고르기용)
 function areaOfKey(key: string): string {
@@ -572,7 +590,7 @@ export type ProjectGoal = { name: string; current: string; target: string; statu
 export type Project = {
   finish: string | null;          // 다음 검진 예정 (없으면 null)
   goals: ProjectGoal[];           // 최대 3개 (위험 먼저)
-  missions: string[];             // 중복 제거, 최대 4개
+  missions: Mission[];            // 중복 제거, 최대 4개 (효과 포함)
   allClear: boolean;              // 문제 없음 = 유지 프로젝트
 } | null;                         // null = 수치 없음
 
@@ -586,10 +604,10 @@ export function buildProject(data: Record<string, string>): Project {
     target: targetOfKey(w.key, sex),
     status: w.status,
   }));
-  const missions: string[] = [];
+  const missions: Mission[] = [];
   for (const w of warnings) {
     for (const m of AREA_MISSIONS[areaOfKey(w.key)] ?? []) {
-      if (!missions.includes(m) && missions.length < 4) missions.push(m);
+      if (!missions.some((x) => x.m === m.m) && missions.length < 4) missions.push(m);
     }
   }
   return {

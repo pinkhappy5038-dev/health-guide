@@ -405,7 +405,10 @@ function ProjectPart({ data, onInput }: { data: Data; onInput: () => void }) {
             <h2>📅 이번 시즌 미션</h2>
             <div className="body">
               {proj.missions.map((m, i) => (
-                <div className="mission-row" key={i}>🎯 {m}</div>
+                <div className="mission-row" key={i}>
+                  <div className="mission-text">🎯 {m.m}</div>
+                  <div className="mission-effect">💪 꾸준히 하면: {m.effect}</div>
+                </div>
               ))}
               <div className="mission-note">매일의 실천 체크는 Part 8(오늘의 체크리스트)에서 — 곧 이 미션들이 거기로 연결될 거예요.</div>
             </div>
