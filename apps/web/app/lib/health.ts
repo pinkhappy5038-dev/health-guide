@@ -71,7 +71,7 @@ export const SECTIONS: Section[] = [
 // ===== 나에 대해 (건강 수치 아님 — 입력만 받고 Part 2 점수엔 안 나옴) =====
 // Part 6(다음 검진까지 프로젝트)·Part 9(미래 질환 위험)에서 쓸 재료.
 export const PROFILE_FIELDS: Item[] = [
-  { key: "name", name: "이름", unit: "", type: "text", placeholder: "예: 숙경" },
+  { key: "name", name: "이름 (성 빼고)", unit: "", type: "text", placeholder: "예: 숙경" },
   { key: "birthYear", name: "출생연도", unit: "년", placeholder: "예: 1958" },
   { key: "job", name: "직업", unit: "", type: "text", placeholder: "예: 주부, 회사원" },
   { key: "nextCheckup", name: "다음 검진 예정", unit: "", type: "text", placeholder: "예: 2028년 1월" },
