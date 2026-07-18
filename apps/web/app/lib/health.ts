@@ -67,6 +67,10 @@ export const SECTIONS: Section[] = [
       ref: (s) => s === "여" ? "여 12~16" : "남 13~16.5",
       eval: (v, s) => { const lo = s === "여" ? 12 : 13; return v >= lo ? "good" : v >= lo - 1 ? "warn" : "bad"; } },
   ]},
+  { title: "염증·피로", items: [
+    { key: "wbc", name: "백혈구(WBC)", unit: "10³/μL", ref: () => "4.0~10.0",
+      eval: (v) => (v >= 4 && v <= 10) ? "good" : (v > 10 && v <= 12) || (v >= 3 && v < 4) ? "warn" : "bad" },
+  ]},
 ];
 
 // ===== 나에 대해 (건강 수치 아님 — 입력만 받고 Part 2 점수엔 안 나옴) =====
@@ -194,6 +198,7 @@ const SCORE_AREAS: { key: string; name: string; icon: string; itemKeys: string[]
   { key: "liver",    name: "간 건강",   icon: "🫁", itemKeys: ["ast", "alt", "ggt"] },
   { key: "kidney",   name: "콩팥 건강", icon: "🫘", itemKeys: ["cr", "egfr"] },
   { key: "weight",   name: "체중·비만", icon: "⚖️", itemKeys: ["bmi", "waist"] },
+  { key: "inflam",   name: "염증·피로", icon: "🔥", itemKeys: ["wbc"] },
 ];
 
 // 항목 하나의 판정(정상/주의/위험). 값이 없거나 판정 불가면 null.
@@ -246,6 +251,7 @@ const WARN_MSG: Record<string, string> = {
   bmi: "몸에 살이 좀 붙어서 관리가 필요해요",
   waist: "몸에 살이 좀 붙어서 관리가 필요해요",
   hb: "피 속 산소 배달부가 부족해요",
+  wbc: "높으면 몸이 어딘가 염증과 싸우는 중이에요 — 요즘 유난히 피곤했다면 그 때문일 수 있어요. 낮으면 면역이 약해진 상태예요. 감기·잇몸 염증에도 오르니, 계속 이러면 원인은 의사와 확인하세요",
 };
 
 export type Warning = { key: string; name: string; status: "warn" | "bad"; msg: string };
@@ -280,6 +286,7 @@ const TERM_EXPLAIN: Record<string, string> = {
   hb: "피 속에서 산소를 실어 나르는 배달부예요. 부족하면 빈혈 — 쉽게 지치고 어지러워요.",
   bmi: "키에 비해 몸무게가 적당한지 보는 숫자예요. 몸무게(kg)를 키(m)의 제곱으로 나눠 계산해요.",
   waist: "뱃속 내장 사이에 낀 지방을 가늠하는 줄자예요. 내장지방은 혈관·혈당의 적이에요.",
+  wbc: "몸을 지키는 군인(백혈구)의 숫자예요. 몸 어딘가에 염증·감염이 생기면 군인이 늘어나요. 그래서 이 수치가 높으면 요즘 왜 피곤했는지 실마리가 되기도 해요.",
 };
 
 export type TermEntry = {
