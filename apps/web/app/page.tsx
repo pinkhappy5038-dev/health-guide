@@ -725,8 +725,18 @@ function FieldRow({ it, value, onField }: { it: Item; value: string; onField: (k
         <input type="text" placeholder={it.placeholder ?? ""} value={value}
           onChange={(e) => onField(it.key, e.target.value)} />
       ) : (
-        <input type="number" inputMode="decimal" step="any" placeholder={it.placeholder ?? "-"}
-          value={value} onChange={(e) => onField(it.key, e.target.value)} />
+        <input
+          type="number"
+          inputMode={it.intOnly === true ? "numeric" : "decimal"}
+          step={it.intOnly === true ? "1" : "any"}
+          placeholder={it.placeholder ?? "-"}
+          value={value}
+          onChange={(e) => {
+            // 정수 전용 칸(출생연도)엔 소수점이 들어오면 잘라낸다
+            const v = it.intOnly === true ? e.target.value.split(".")[0] : e.target.value;
+            onField(it.key, v);
+          }}
+        />
       )}
     </div>
   );
